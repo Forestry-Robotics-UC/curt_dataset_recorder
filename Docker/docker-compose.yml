@@ -1,41 +1,66 @@
 networks:
   ros2-net:
+  link-local-net:
+    driver: macvlan
+    driver_opts:
+      parent: enp86s0  # Specify your parent network interface (e.g., enp86s0)
+    ipam:
+      config:
+        - subnet: 169.254.0.0/16
+          gateway: 169.254.0.1
 
 services:
-  xsens:
+#  xsens:
+#    build:
+#     context: .
+#     dockerfile: xsens/xsens.Dockerfile
+#    container_name: xsens
+#    privileged: true
+#    networks:
+#      - ros2-net
+#    volumes:
+#      - /dev/:/dev/
+#      - ../ros2_ws/xsens-build:/root/ros2_ws/build
+#      - ../shared_folder/:/root/shared_folder/
+#      - ../sensor_configs/xsens/mtdevice.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtdevice.py:rw
+#      - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
+#      - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
+#    command: /root/shared_folder/xsens-launch.sh
+  openzen:
+    image: docker-openzen:latest
     build:
      context: .
-     dockerfile: xsens/xsens.Dockerfile
-    container_name: xsens
+     dockerfile: openzen/openzen.Dockerfile
+    container_name: openzen
     privileged: true
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
     networks:
       - ros2-net
     volumes:
       - /dev/:/dev/
-      - ../ros2_ws/xsens-build:/root/ros2_ws/build
+      - ../ros2_ws/openzen-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
-      - ../sensor_configs/xsens/mtdevice.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtdevice.py:rw
-      - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
-      - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
-    command: /root/shared_folder/xsens-launch.sh
+    command: /root/shared_folder/openzen-launch.sh
 
-  emlid:
-    build:
-      context: .
-      dockerfile: emlid/emlid.Dockerfile
-    container_name: emlid
-    privileged: true
-    networks:
-      - ros2-net
-    volumes:
-      - /dev/:/dev/
-      - ../ros2_ws/emlid-build:/root/ros2_ws/build
-      - ../shared_folder/:/root/shared_folder/
-      - ../sensor_configs/emlid/nmea_serial_driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/nodes/nmea_serial_driver.py:rw
-      - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
-    command: /root/shared_folder/emlid-launch.sh
+#  emlid:
+#    build:
+#      context: .
+#      dockerfile: emlid/emlid.Dockerfile
+#    container_name: emlid
+#    privileged: true
+#    networks:
+#      - ros2-net
+#    volumes:
+#      - /dev/:/dev/
+#      - ../ros2_ws/emlid-build:/root/ros2_ws/build
+#      - ../shared_folder/:/root/shared_folder/
+#      - ../sensor_configs/emlid/nmea_serial_driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/nodes/nmea_serial_driver.py:rw
+#      - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
+#    command: /root/shared_folder/emlid-launch.sh
 
   realsense:
+    image: docker-realsense:latest
     build:
       context: .
       dockerfile: realsense/realsense.Dockerfile
@@ -51,6 +76,7 @@ services:
     command: /root/shared_folder/realsense-launch.sh
 
   ouster:
+    image: docker-ouster:latest
     build:
       context: .
       dockerfile: ouster/os.Dockerfile
@@ -58,16 +84,32 @@ services:
     privileged: true
     networks:
       - ros2-net
+      - link-local-net
     ports:
       - "7502:7502/udp"
       - "7503:7503/udp"
     volumes:
       - ../ros2_ws/ouster-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
-      - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/config/driver_params.yaml:rw
+      - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/ouster-ros/config/driver_params.yaml:rw
     command: /root/shared_folder/ouster-launch.sh
 
+  evk4:
+    image: docker-evk4:latest
+    build:
+      context: .
+      dockerfile: evk4/evk4.Dockerfile
+    container_name: evk4
+    privileged: true
+    networks:
+      - ros2-net
+      - link-local-net
+    volumes:
+      - ../shared_folder/:/root/shared_folder/
+    command:  /root/shared_folder/evk4-launch.sh
+
   recorder:
+    image: docker-recorder:latest
     build:
       context: .
       dockerfile: recorder/recorder.Dockerfile
