@@ -1,0 +1,84 @@
+networks:
+  ros2-net:
+
+services:
+  xsens:
+    build:
+     context: .
+     dockerfile: xsens/xsens.Dockerfile
+    container_name: xsens
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/xsens-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/xsens/mtdevice.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtdevice.py:rw
+      - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
+      - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
+    command: /root/shared_folder/xsens-launch.sh
+
+  emlid:
+    build:
+      context: .
+      dockerfile: emlid/emlid.Dockerfile
+    container_name: emlid
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/emlid-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/emlid/nmea_serial_driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/nodes/nmea_serial_driver.py:rw
+      - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
+    command: /root/shared_folder/emlid-launch.sh
+
+  realsense:
+    build:
+      context: .
+      dockerfile: realsense/realsense.Dockerfile
+    container_name: realsense
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/realsense-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
+    command: /root/shared_folder/realsense-launch.sh
+
+  ouster:
+    build:
+      context: .
+      dockerfile: ouster/os.Dockerfile
+    container_name: ouster
+    privileged: true
+    networks:
+      - ros2-net
+    ports:
+      - "7502:7502/udp"
+      - "7503:7503/udp"
+    volumes:
+      - ../ros2_ws/ouster-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/config/driver_params.yaml:rw
+    command: /root/shared_folder/ouster-launch.sh
+
+  recorder:
+    build:
+      context: .
+      dockerfile: recorder/recorder.Dockerfile
+    container_name: recorder
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - /$HOME/rosbags/:/root/rosbags/
+      - ../ros2_ws/recorder-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+    command: /root/shared_folder/recorder-launch.sh
+

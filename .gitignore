@@ -1,0 +1,8 @@
+COLCON_IGNORE
+nmea_navsat_driver
+realsense2_*
+hector_*
+ouster_ros/
+ouster_sensor_msgs/
+openzen_driver/
+
