@@ -42,7 +42,7 @@ fi
 BAG_NAME="$(date +%Y_%m_%d_%H_%M_%S)__${label}_"
 
 #Topics to record
-TOPICS="/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /camera/imu /imu/data /imu/mag /fix /tf /tf_static"
+TOPICS="/ouster/points /ouster/imu /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /camera/imu /imu/data /imu/mag /event_camera/events /fix /tf /tf_static"
 
 mkdir -p "$BAG_DIR"
 

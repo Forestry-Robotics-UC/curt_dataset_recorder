@@ -26,6 +26,7 @@ RUN apt -y install ros-jazzy-rmw-cyclonedds-cpp \
     ros-jazzy-diagnostic-updater \
     ros-jazzy-realsense2-camera-msgs \
     ros-jazzy-pcl-ros \
+    ros-jazzy-metavision-driver \
     ros-jazzy-tf2-eigen
 
 #Configure catkin workspace
