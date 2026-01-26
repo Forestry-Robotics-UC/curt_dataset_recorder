@@ -1,0 +1,29 @@
+# Default parameters for `mapir_camera_ros2` camera_node.
+#
+# ROS 2 YAML parameter files are matched by node name. Using `/**` makes this
+# file apply regardless of whether you run the node as `mapir_camera` (default)
+# or rename it (e.g., launch files often set name:=camera).
+
+/**:
+  ros__parameters:
+    # Common (most users)
+    video_device: /dev/video0  # '/dev/videoX' or numeric index string
+    pixel_format: MJPG  # MJPG or H264 (device-dependent)
+    use_gstreamer: true  # recommended for MJPG/H264 decode on most systems
+    image_width: 640 #1280
+    image_height: 480 #720
+    framerate: 30.0
+
+    # Frames / calibration
+    frame_id: mapir3_optical_frame
+    camera_name: mapir3_ocn
+    # camera_info_url: ''  # file:///abs/path/to/calibration.yaml
+
+    # Advanced (optional)
+    debug: False
+    # debug_period_s: 1.0
+    # gstreamer_pipeline: ''  # Optional override. Leave empty to auto-build from params.
+    # reconnect_interval_s: 2.0  # retry open when camera is unplugged
+    # use_capture_thread: true  # dedicated capture thread for stable FPS
+    qos_best_effort: true
+    qos_depth: 5

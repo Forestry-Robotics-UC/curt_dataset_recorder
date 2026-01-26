@@ -1,0 +1,1 @@
+mapir_camera_core

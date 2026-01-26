@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Some properties -->
+  <xacro:include filename="properties.xacro" />
+
+  <!-- Property quick access -->
+  <xacro:property name="ouster_z_offset" value="0.206440" />
+  <xacro:property name="xsens_x_offset" value="${-0.015121}" />
+  <xacro:property name="xsens_y_offset" value="${-0.046950}" />
+  <xacro:property name="xsens_z_offset" value="0.0586" />
+  <xacro:property name="realsense_x_offset" value="0.8" />
+  <xacro:property name="realsense_y_offset" value="0.058" />
+  <xacro:property name="realsense_z_offset" value="0.082" />
+
+  <!-- LPResearch CANAL3 IMU -->
+  <joint name="base_link_to_imu" type="fixed">
+    <parent link="base_link" />
+    <child link="imu_link" />
+    <origin xyz="0.062 0.0 0.015" rpy="0.0 0.0 ${pi/2}" />
+  </joint>
+  <link name="imu_link" />
+
+  <!-- OUSTER LINKS -->
+  <link name="os_sensor">
+    <collision>
+      <origin rpy="-1.57 1.57 0" xyz="0.0 -0.05 0.0"/>
+      <geometry>
+        <cylinder length="0.1" radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0.5" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="meshes/Assembly_OS1.obj" />
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="1e-5"/>
+      <origin rpy="0 0 0" xyz="0.0 0 0.0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+
+  <!-- OUSTER JOINTS -->
+  <joint name="base_link_to_os_sensor" type="fixed">
+    <parent link="base_link" />
+    <child link="os_sensor" />
+    <origin xyz="0 0 ${ouster_z_offset}" rpy="0 0 ${pi}" />
+  </joint>
+  <joint name="os_sensor_to_os_lidar" type="fixed">
+    <parent link="os_sensor" />
+    <child link="os_lidar" />
+    <origin xyz="0.5 0 0" rpy="0 0 0" />
+  </joint>
+
+  <!-- REALSENSE LINKS -->
+  <link name="camera_link">
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0.0"/>
+      <geometry>
+        <!-- <cylinder length="0.05" radius="0.05"/> -->
+        <box size="0.09 0.03 0.035"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0.5" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="meshes/Assembly_Cameras.obj" />
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="1e-5"/>
+      <origin rpy="0 0 0" xyz="0.0 0 0.0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
+
+  <!-- REALSENSE JOINT -->
+  <joint name="base_link_to_camera_link" type="fixed">
+    <parent link="base_link" />
+    <child link="camera_link" />
+    <origin xyz="-0.018599905044461885 0.08479126746983127 -0.09082252118430068"
+            rpy="0.0013625367954899733 0.003069697768602153 1.558103710329454" />
+  </joint>
+
+  <!-- GAZEBO SENSOR DEFINITIONS -->
+  <gazebo reference="os_sensor">
+    <material>Gazebo/Black</material>
+    <gravity>true</gravity>
+    <sensor name="laser" type="ray">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.141592653589793</min_angle>
+            <max_angle>3.141592653589793</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.2</min>
+          <max>40</max>
+          <resolution>0.025</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.0</stddev>
+        </noise>
+      </ray>
+      <plugin filename="libgazebo_ros_laser.so" name="laser_controller">
+        <robotNamespace/>
+        <topicName>scan</topicName>
+        <frameName>os_sensor</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>

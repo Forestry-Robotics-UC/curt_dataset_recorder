@@ -43,21 +43,21 @@ services:
       - ../shared_folder/:/root/shared_folder/
     command: /root/shared_folder/openzen-launch.sh
 
-#  emlid:
-#    build:
-#      context: .
-#      dockerfile: emlid/emlid.Dockerfile
-#    container_name: emlid
-#    privileged: true
-#    networks:
-#      - ros2-net
-#    volumes:
-#      - /dev/:/dev/
-#      - ../ros2_ws/emlid-build:/root/ros2_ws/build
-#      - ../shared_folder/:/root/shared_folder/
-#      - ../sensor_configs/emlid/nmea_serial_driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/nodes/nmea_serial_driver.py:rw
-#      - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
-#    command: /root/shared_folder/emlid-launch.sh
+  emlid:
+    build:
+      context: .
+      dockerfile: emlid/emlid.Dockerfile
+    container_name: emlid
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/emlid-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/emlid/nmea_serial_driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/nodes/nmea_serial_driver.py:rw
+      - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
+    command: /root/shared_folder/emlid-launch.sh
 
   realsense:
     image: docker-realsense:latest
@@ -103,10 +103,28 @@ services:
     privileged: true
     networks:
       - ros2-net
-      - link-local-net
     volumes:
       - ../shared_folder/:/root/shared_folder/
     command:  /root/shared_folder/evk4-launch.sh
+
+  mapir:
+    image: docker-mapir:latest
+    build:
+      context: .
+      dockerfile: mapir/mapir.Dockerfile
+    container_name: mapir
+    privileged: true
+    networks:
+      - ros2-net
+    devices:
+      - /dev/mapir:/dev/video0
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/mapir-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
+      - /home/curt/Documents/Duda/mapir-camera-ros2:/root/ros2_ws/src/mapir-camera-ros2:ro
+    command: /root/shared_folder/mapir-launch.sh
 
   recorder:
     image: docker-recorder:latest

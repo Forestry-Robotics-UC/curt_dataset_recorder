@@ -21,7 +21,7 @@ RUN mkdir -p $CATKIN_WS/src
 
 #Clone realsense pkg
 WORKDIR $CATKIN_WS/src
-RUN git clone https://github.com/IntelRealSense/realsense-ros.git
+RUN git clone -b r/4.56.4 https://github.com/IntelRealSense/realsense-ros.git
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
