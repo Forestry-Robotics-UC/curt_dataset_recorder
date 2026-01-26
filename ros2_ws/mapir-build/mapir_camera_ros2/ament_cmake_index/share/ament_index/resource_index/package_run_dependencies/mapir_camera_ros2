@@ -1,1 +1,0 @@
-rclcpp;rclpy;sensor_msgs;std_msgs;cv_bridge;rcl_interfaces;camera_info_manager;camera_info_manager_py;launch;launch_ros;python3-numpy;python3-opencv;image_transport;ament_copyright;ament_cmake_gtest;ament_cmake_pytest;ament_flake8;ament_lint_auto;ament_lint_common;ament_pep257;launch_testing;launch_testing_ros;python3-pytest;python3-pytest-cov

@@ -1,8 +1,10 @@
 COLCON_IGNORE
+AMENT_IGNORE
 nmea_navsat_driver
 realsense2_*
 hector_*
 ouster_ros/
 ouster_sensor_msgs/
 openzen_driver/
-
+mapir_camera_ros2/
+.built_by

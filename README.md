@@ -28,6 +28,7 @@ The entire data-acquisition system for the CURTmini is organized under:
 │   ├── emlid/
 │   ├── realsense/
 │   ├── xsens/
+├──curt_description/
 ```
 
 ### 1.1 Docker Containers
@@ -63,6 +64,10 @@ The recorder entry point runs the **hector_recorder** ROS2 command.
 ### 1.4 Sensor Configuration
 
 This folder has every configuration needed to each sensor. Every sensor has its own directory and the files are linked to the respective containers.
+
+### 1.5 CURTmini URDF Package
+
+This folder has the package needed to launch the CURTmini URDF with all the sensors.
 
 ---
 
@@ -155,5 +160,9 @@ Launch file:
 
 Launch file:
 `xsens/xsens_driver.launch.xml`
+
+### 4.5 OpenZen IMU
+
+To configure the OpenZen IMU, download the [official software](https://lp-research.atlassian.net/wiki/spaces/LKB/pages/1138294814/LPMS+Data+Acquisition+Software). However, is only compatible with Windows.
 
 ---
