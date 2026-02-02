@@ -35,7 +35,7 @@ ouster/os_driver:
     # - RNG15_RFL8_NIR8
     # - RNG19_RFL8_SIG16_NIR16_DUAL
     # - FUSA_RNG15_RFL8_NIR8_DUAL
-    udp_profile_lidar: 'RNG15_RFL8_NIR8'
+    udp_profile_lidar: 'RNG19_RFL8_SIG16_NIR16'
     # metadata[optional]: path to save metadata file to, if left empty a file
     # with the sensor hostname or ip will be crearted in ~/.ros folder.
     metadata: ''
@@ -63,7 +63,7 @@ ouster/os_driver:
     pub_static_tf: true
     # proc_mask[optional]: use any combination of the 6 flags IMG, PCL, IMU, SCAN
     # RAW and TLM to enable or disable their respective messages.
-    proc_mask: IMU|PCL
+    proc_mask: RAW #"RAW" # Only publish RAW|IMU|PCL packets
     # scan_ring[optional]: use this parameter in conjunction with the SCAN flag
     # to select which beam of the LidarScan to use when producing the LaserScan
     # message. Choose a value the range [0, sensor_beams_count).

@@ -7,11 +7,11 @@
 /**:
   ros__parameters:
     # Common (most users)
-    video_device: /dev/video0  # '/dev/videoX' or numeric index string
+    video_device: /dev/mapir  # '/dev/videoX' or numeric index string
     pixel_format: MJPG  # MJPG or H264 (device-dependent)
     use_gstreamer: true  # recommended for MJPG/H264 decode on most systems
-    image_width: 640 #1280
-    image_height: 480 #720
+    image_width: 1280
+    image_height: 720
     framerate: 30.0
 
     # Frames / calibration

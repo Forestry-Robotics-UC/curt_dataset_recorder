@@ -10,22 +10,6 @@ networks:
           gateway: 169.254.0.1
 
 services:
-#  xsens:
-#    build:
-#     context: .
-#     dockerfile: xsens/xsens.Dockerfile
-#    container_name: xsens
-#    privileged: true
-#    networks:
-#      - ros2-net
-#    volumes:
-#      - /dev/:/dev/
-#      - ../ros2_ws/xsens-build:/root/ros2_ws/build
-#      - ../shared_folder/:/root/shared_folder/
-#      - ../sensor_configs/xsens/mtdevice.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtdevice.py:rw
-#      - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
-#      - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
-#    command: /root/shared_folder/xsens-launch.sh
   openzen:
     image: docker-openzen:latest
     build:
@@ -94,19 +78,6 @@ services:
       - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/ouster-ros/config/driver_params.yaml:rw
     command: /root/shared_folder/ouster-launch.sh
 
-  evk4:
-    image: docker-evk4:latest
-    build:
-      context: .
-      dockerfile: evk4/evk4.Dockerfile
-    container_name: evk4
-    privileged: true
-    networks:
-      - ros2-net
-    volumes:
-      - ../shared_folder/:/root/shared_folder/
-    command:  /root/shared_folder/evk4-launch.sh
-
   mapir:
     image: docker-mapir:latest
     build:
@@ -116,8 +87,6 @@ services:
     privileged: true
     networks:
       - ros2-net
-    devices:
-      - /dev/mapir:/dev/video0
     volumes:
       - /dev/:/dev/
       - ../ros2_ws/mapir-build:/root/ros2_ws/build
@@ -125,6 +94,21 @@ services:
       - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
       - /home/curt/Documents/Duda/mapir-camera-ros2:/root/ros2_ws/src/mapir-camera-ros2:ro
     command: /root/shared_folder/mapir-launch.sh
+
+  curt:
+    image: docker-curt:latest
+    build:
+      context: .
+      dockerfile: curt/curt.Dockerfile
+    container_name: curt
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - ../ros2_ws/curt-build:/root/ros2_ws/build
+      - ../ros2_ws/curt_description:/root/ros2_ws/src/curt_description
+      - ../shared_folder/:/root/shared_folder/
+    command: /root/shared_folder/curt-launch.sh
 
   recorder:
     image: docker-recorder:latest
@@ -137,8 +121,54 @@ services:
       - ros2-net
     volumes:
       - /dev/:/dev/
-      - /$HOME/rosbags/:/root/rosbags/
+      - /$HOME/Documents/Duarte/rosbags:/root/rosbags/
       - ../ros2_ws/recorder-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
     command: /root/shared_folder/recorder-launch.sh
 
+  ## Extra Sensors
+
+  # rm3100:
+  #   build:
+  #     context: .
+  #     dockerfile: rm3100/rm3100.Dockerfile
+  #   container_name: rm3100
+  #   privileged: true
+  #   networks:
+  #     - ros2-net
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/rm3100-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/rm3100/params.yaml:/root/ros2_ws/src/go1_magnetometer_rm3100/config/params.yaml:rw
+  #   command: /root/shared_folder/rm3100-launch.sh
+
+  # evk4:
+  #   image: docker-evk4:latest
+  #   build:
+  #     context: .
+  #     dockerfile: evk4/evk4.Dockerfile
+  #   container_name: evk4
+  #   privileged: true
+  #   networks:
+  #     - ros2-net
+  #   volumes:
+  #     - ../shared_folder/:/root/shared_folder/
+  #   command:  /root/shared_folder/evk4-launch.sh
+
+  # xsens:
+  #   build:
+  #     context: .
+  #     dockerfile: xsens/xsens.Dockerfile
+  #   container_name: xsens
+  #   privileged: true
+  #   networks:
+  #     - ros2-net
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/xsens-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/xsens/mtdevice.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtdevice.py:rw
+  #     - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
+  #     - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
+  #   command: /root/shared_folder/xsens-launch.sh

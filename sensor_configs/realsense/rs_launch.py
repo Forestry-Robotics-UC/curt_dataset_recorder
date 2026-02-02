@@ -27,7 +27,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'device_type',                  'default': "''", 'description': 'choose device by type'},
                            {'name': 'config_file',                  'default': "''", 'description': 'yaml config file'},
                            {'name': 'json_file_path',               'default': "''", 'description': 'allows advanced configuration'},
-                           {'name': 'initial_reset',                'default': 'true', 'description': "''"},
+                           {'name': 'initial_reset',                'default': 'false', 'description': "''"},
                            {'name': 'accelerate_gpu_with_glsl',     'default': "false", 'description': 'enable GPU acceleration with GLSL'},
                            {'name': 'rosbag_filename',              'default': "''", 'description': 'A realsense bagfile to run from as a device'},
                            {'name': 'rosbag_loop',                  'default': 'false', 'description': 'Enable loop playback when playing a bagfile'},

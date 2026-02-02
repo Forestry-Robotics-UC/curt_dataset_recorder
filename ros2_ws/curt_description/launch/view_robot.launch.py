@@ -14,7 +14,7 @@ def generate_launch_description():
     # Arguments
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     simulation = LaunchConfiguration('simulation', default='false')
-    gui = LaunchConfiguration('gui', default='true')
+    gui = LaunchConfiguration('gui', default='false')
     
     # Launch description
     ld = LaunchDescription()
@@ -24,7 +24,7 @@ def generate_launch_description():
                                         description='Use simulation (Gazebo) clock if true'))
     ld.add_action(DeclareLaunchArgument('simulation', default_value='false',
                                         description='Run simulation if true'))
-    ld.add_action(DeclareLaunchArgument('gui', default_value='true',
+    ld.add_action(DeclareLaunchArgument('gui', default_value='false',
                                         description='Show joint_state_publisher GUI'))
     
     # Include robot_state_publisher launch file
