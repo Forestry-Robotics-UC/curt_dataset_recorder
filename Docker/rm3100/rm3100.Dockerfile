@@ -25,7 +25,8 @@ RUN apt install -y \
     ros-$ROS_DISTRO-sensor-msgs \
     ros-$ROS_DISTRO-std-msgs \
     ros-$ROS_DISTRO-backward-ros \
-    ros-$ROS_DISTRO-rmw-cyclonedds-cpp
+    ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
+    ros-$ROS_DISTRO-imu-tools
 
 #Configure catkin workspace
 ENV CATKIN_WS=/root/ros2_ws

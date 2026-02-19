@@ -18,9 +18,25 @@
   <joint name="base_link_to_imu" type="fixed">
     <parent link="base_link" />
     <child link="imu_link" />
-    <origin xyz="0.062 0.0 0.015" rpy="0.0 ${pi} ${pi/2}" />
+    <origin xyz="0.062 0.0 0.015" rpy="0.0 0.0 -${pi/2}" />
   </joint>
   <link name="imu_link" />
+
+  <!-- RM3100 MAG -->
+  <joint name="base_link_to_mag" type="fixed">
+    <parent link="base_link" />
+    <child link="mag" />
+    <origin xyz="0.2 0.0 0.204" rpy="0.0 0.0 ${pi}" />
+  </joint>
+  <link name="mag" />
+
+  <!-- Emlid Antenna -->
+  <joint name="base_link_to_gps" type="fixed">
+    <parent link="base_link" />
+    <child link="gps" />
+    <origin xyz="0.25 -0.11 0.204" rpy="0.0 0.0 0.0" />
+  </joint>
+  <link name="gps" />
 
   <!-- OUSTER TOWER VISUAL LINK -->
   <!-- This link contains only the visual mesh for the ouster lidar -->
