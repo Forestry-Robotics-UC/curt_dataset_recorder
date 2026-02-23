@@ -69,7 +69,7 @@ if [ -z "$bag_path" ]; then
  echo "No bag path found for ${BAG_NAME}"
  exit 1
 fi
-echo "Writing rosbag info to: $bag_path/info.txt"
+echo "Writing rosbag info to: Documents/Duarte/rosbags/${BAG_NAME}/info.txt"
 
 #Wait briefly for metadata.yaml to appear (up to 30s)
 for i in $(seq 1 30); do

@@ -16,7 +16,7 @@ RUN apt update \
     iproute2 \
     python3-pip
 
-RUN pip install dronecan --break-system-packages
+RUN pip install dronecan ahrs --break-system-packages
 
 #Install ROS Packages
 RUN apt install -y \
@@ -25,8 +25,7 @@ RUN apt install -y \
     ros-$ROS_DISTRO-sensor-msgs \
     ros-$ROS_DISTRO-std-msgs \
     ros-$ROS_DISTRO-backward-ros \
-    ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
-    ros-$ROS_DISTRO-imu-tools
+    ros-$ROS_DISTRO-rmw-cyclonedds-cpp
 
 #Configure catkin workspace
 ENV CATKIN_WS=/root/ros2_ws
