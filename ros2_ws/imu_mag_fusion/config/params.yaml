@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    imu_topic: '/imu/data' # Input topic for IMU data
+    mag_topic: '/mag' # Input topic for magnetometer data
+    fused_topic: '/imu/fused' # Output topic for fused IMU data
