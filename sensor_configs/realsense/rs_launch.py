@@ -60,7 +60,7 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'depth_module.exposure.2',      'default': '1', 'description': 'Depth module second exposure value. Used for hdr_merge filter'},
                            {'name': 'depth_module.gain.2',          'default': '16', 'description': 'Depth module second gain value. Used for hdr_merge filter'},
                            {'name': 'enable_sync',                  'default': 'true', 'description': "'enable sync mode'"},
-                           {'name': 'depth_module.inter_cam_sync_mode',               'default': "4", 'description': '[0-Default, 1-Master, 2-Slave]'},
+                           {'name': 'depth_module.inter_cam_sync_mode',               'default': "2", 'description': '[0-Default, 1-Master, 2-Slave]'},
                            {'name': 'enable_rgbd',                  'default': 'false', 'description': "'enable rgbd topic'"},
                            {'name': 'enable_gyro',                  'default': 'true', 'description': "'enable gyro stream'"},
                            {'name': 'enable_accel',                 'default': 'true', 'description': "'enable accel stream'"},

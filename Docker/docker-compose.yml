@@ -28,6 +28,22 @@ services:
       - ../sensor_configs/openzen/OpenZenNode.cpp:/root/ros2_ws/src/openzenros2/src/OpenZenNode.cpp
     command: /root/shared_folder/openzen-launch.sh
 
+  rm3100:
+    build:
+      context: .
+      dockerfile: rm3100/rm3100.Dockerfile
+    container_name: rm3100
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/rm3100-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/rm3100/params.yaml:/root/ros2_ws/src/go1_magnetometer_rm3100/config/params.yaml:rw
+      - ../ros2_ws/imu_mag_fusion:/root/ros2_ws/src/imu_mag_fusion
+    command: /root/shared_folder/rm3100-launch.sh
+
   emlid:
     build:
       context: .
@@ -122,28 +138,12 @@ services:
       - ros2-net
     volumes:
       - /dev/:/dev/
-      - /$HOME/Documents/Duarte/rosbags:/root/rosbags/
+      - ../../rosbags:/root/rosbags/
       - ../ros2_ws/recorder-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
     command: /root/shared_folder/recorder-launch.sh
 
   ## Extra Sensors
-
-  rm3100:
-    build:
-      context: .
-      dockerfile: rm3100/rm3100.Dockerfile
-    container_name: rm3100
-    privileged: true
-    networks:
-      - ros2-net
-    volumes:
-      - /dev/:/dev/
-      - ../ros2_ws/rm3100-build:/root/ros2_ws/build
-      - ../shared_folder/:/root/shared_folder/
-      - ../sensor_configs/rm3100/params.yaml:/root/ros2_ws/src/go1_magnetometer_rm3100/config/params.yaml:rw
-      - ../ros2_ws/imu_mag_fusion:/root/ros2_ws/src/imu_mag_fusion
-    command: /root/shared_folder/rm3100-launch.sh
 
   # evk4:
   #   image: docker-evk4:latest

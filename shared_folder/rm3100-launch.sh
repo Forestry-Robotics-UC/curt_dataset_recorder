@@ -20,6 +20,12 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 # Source ROS2 Workspace
 source /root/ros2_ws/install/setup.bash
 
+# Wait for can0 to be available
+while ! ip link show can0 &> /dev/null; do
+    echo "Waiting for can0..."
+    sleep 1
+done
+
 #Run Imu fusing pkg to run Madwick filter
 ros2 launch imu_mag_fusion imu_mag_fusion.launch.py &
 

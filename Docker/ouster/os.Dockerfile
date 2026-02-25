@@ -28,7 +28,8 @@ RUN mkdir -p $CATKIN_WS/src
 
 #Clone Ouster ROS2 pkg
 WORKDIR $CATKIN_WS/src
-RUN git clone -b ros2 --recurse-submodules https://github.com/ouster-lidar/ouster-ros.git
+#RUN git clone -b ros2 --recurse-submodules https://github.com/ouster-lidar/ouster-ros.git
+RUN git clone -b ros2 --recurse-submodules https://github.com/errorcodecritical/ouster-ros.git
 
 #Build workspace
 WORKDIR $CATKIN_WS

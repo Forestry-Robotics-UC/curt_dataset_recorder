@@ -22,7 +22,6 @@ sleep 10
 #Database of random names to bags
 names_dir="/root/shared_folder"
 name_1=$(shuf -n 1 "$names_dir/.names_1")
-name_2=$(shuf -n 1 "$names_dir/.names_2")
 
 # Directory where the bags are saved
 BAG_DIR="/root/rosbags"
@@ -69,7 +68,6 @@ if [ -z "$bag_path" ]; then
  echo "No bag path found for ${BAG_NAME}"
  exit 1
 fi
-echo "Writing rosbag info to: Documents/Duarte/rosbags/${BAG_NAME}/info.txt"
 
 #Wait briefly for metadata.yaml to appear (up to 30s)
 for i in $(seq 1 30); do

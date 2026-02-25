@@ -2,7 +2,7 @@ ouster/os_driver:
   ros__parameters:
     # sensor_hostname[required]: hostname or IP address of the sensor (IP4 or
     # IP6).
-    sensor_hostname: '169.254.49.182'
+    sensor_hostname: "169.254.49.182" 
     # udp_dest[optional]: hostname or multicast group IP where the sensor will
     # send UDP data packets.
     udp_dest: ''
@@ -12,11 +12,11 @@ ouster/os_driver:
     mtp_dest: ''
     # mtp_main[optional]: if true, then configure and reinit the sensor,
     # otherwise start client with active configuration of sensor
-    mtp_main: false
+    mtp_main: true
     # lidar_mode[optional]: resolution and rate; possible values: { 512x10,
     # 512x20, 1024x10, 1024x20, 2048x10, 4096x5 }. Leave empty to remain on
     # current the lidar mode.
-    lidar_mode: ''
+    lidar_mode: "1024x20"
     # timestamp_mode[optional]: method used to timestamp measurements; possible
     # values:
     # - TIME_FROM_INTERNAL_OSC
@@ -25,7 +25,7 @@ ouster/os_driver:
     # - TIME_FROM_ROS_TIME: This option uses the time of reception of first
     #                       packet of a LidarScan as the timestamp of the IMU,
     #                       PointCloud2 and LaserScan messages.
-    timestamp_mode: 'TIME_FROM_ROS_TIME'
+    timestamp_mode: "TIME_FROM_ROS_TIME"
     # ptp_utc_tai_offset[optional]: UTC/TAI offset in seconds to apply when
     # TIME_FROM_PTP_1588 timestamp mode is used.
     ptp_utc_tai_offset: -37.0
@@ -35,7 +35,7 @@ ouster/os_driver:
     # - RNG15_RFL8_NIR8
     # - RNG19_RFL8_SIG16_NIR16_DUAL
     # - FUSA_RNG15_RFL8_NIR8_DUAL
-    udp_profile_lidar: 'RNG19_RFL8_SIG16_NIR16'
+    udp_profile_lidar: RNG19_RFL8_SIG16_NIR16
     # metadata[optional]: path to save metadata file to, if left empty a file
     # with the sensor hostname or ip will be crearted in ~/.ros folder.
     metadata: ''
@@ -63,7 +63,7 @@ ouster/os_driver:
     pub_static_tf: true
     # proc_mask[optional]: use any combination of the 6 flags IMG, PCL, IMU, SCAN
     # RAW and TLM to enable or disable their respective messages.
-    proc_mask: RAW #"RAW" # Only publish RAW|IMU|PCL packets
+    proc_mask: "RAW" # Only publish RAW|IMU|PCL packets
     # scan_ring[optional]: use this parameter in conjunction with the SCAN flag
     # to select which beam of the LidarScan to use when producing the LaserScan
     # message. Choose a value the range [0, sensor_beams_count).
@@ -125,5 +125,6 @@ ouster/os_driver:
     # mask_path[optional]: path to an image file that will be used to mask parts of the
     # pointcloud.
     mask_path: ''
+
     phase_lock_enable: true
     phase_lock_offset: 0
