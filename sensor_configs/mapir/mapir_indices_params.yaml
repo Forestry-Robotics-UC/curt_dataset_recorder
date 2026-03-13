@@ -10,14 +10,14 @@
 /**:
   ros__parameters:
     # General
-    enabled: true
+    enabled: false
     image_topic: image_raw
     # Indices (case-insensitive). Keep to 1-2 for real-time.
     indices: [ndvi]
     # Band→channel preset (best-effort). Options: RGN, NGB, OCN, RGB.
     filter_set: OCN
     # Optional colorized output (BGR8)
-    publish_color: false
+    publish_color: true
     colormap: viridis  # e.g., viridis, jet, gray, custom (https://matplotlib.org/stable/users/explain/colors/colormaps.html)
     colorize_min: -1.0
     colorize_max: 1.0

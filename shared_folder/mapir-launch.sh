@@ -28,7 +28,4 @@ source "${ROS2_WS}/install/setup.bash"
 ros2 launch mapir_camera_ros2 mapir_camera.launch.py \
   namespace:=mapir \
   camera_impl:=cpp \
-  enable_indices:=true \
   camera_info_url:=file:///root/sensor_configs/mapir/mapir3_ocn_camera_info.yaml
-
-``

@@ -17,7 +17,7 @@ rm3100_driver:
     # Output coordinate frame convention:
     # 'ENU' (East-North-Up) - Standard ROS
     # 'NED' (North-East-Down) 
-    coordinates_frame: 'ENU' 
+    coordinates_frame: 'ENU'
 
     # Heading reference:
     # 'GEOGRAPHIC' - True North (requires declination offset)

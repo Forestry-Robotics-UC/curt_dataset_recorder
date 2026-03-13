@@ -26,6 +26,7 @@ services:
       - ../ros2_ws/openzen-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/openzen/OpenZenNode.cpp:/root/ros2_ws/src/openzenros2/src/OpenZenNode.cpp
+      - ../sensor_configs/openzen/openzen_lpms.launch.py:/root/ros2_ws/src/openzenros2/launch/openzen_lpms.launch.py
     command: /root/shared_folder/openzen-launch.sh
 
   rm3100:
@@ -41,6 +42,8 @@ services:
       - ../ros2_ws/rm3100-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/rm3100/params.yaml:/root/ros2_ws/src/go1_magnetometer_rm3100/config/params.yaml:rw
+      - ../sensor_configs/rm3100/rm3100_driver.launch.py:/root/ros2_ws/src/go1_magnetometer_rm3100/launch/rm3100_driver.launch.py:rw
+      - ../sensor_configs/rm3100/rm3100_driver.py:/root/ros2_ws/src/go1_magnetometer_rm3100/src/rm3100_driver.py:rw
       - ../ros2_ws/imu_mag_fusion:/root/ros2_ws/src/imu_mag_fusion
     command: /root/shared_folder/rm3100-launch.sh
 
@@ -145,18 +148,33 @@ services:
 
   ## Extra Sensors
 
-  # evk4:
-  #   image: docker-evk4:latest
-  #   build:
-  #     context: .
-  #     dockerfile: evk4/evk4.Dockerfile
-  #   container_name: evk4
+  evk4:
+    image: docker-evk4:latest
+    build:
+      context: .
+      dockerfile: evk4/evk4.Dockerfile
+    container_name: evk4
+    privileged: true
+    networks:
+      - ros2-net
+    volumes:
+      - ../shared_folder/:/root/shared_folder/
+    command:  /root/shared_folder/evk4-launch.sh
+
+  # ikalibr:
+  #   image: ulong2/ie_kalibr_image:latest
+  #   container_name: ikalibr
   #   privileged: true
   #   networks:
   #     - ros2-net
   #   volumes:
+  #     - /dev/:/dev/
+  #     - ../../rosbags:/root/rosbags/
   #     - ../shared_folder/:/root/shared_folder/
-  #   command:  /root/shared_folder/evk4-launch.sh
+  #     - /tmp/.X11-unix:/tmp/.X11-unix
+  #   environment:
+  #     - DISPLAY=$DISPLAY
+  #   command: bin/bash
 
   # xsens:
   #   build:
@@ -174,3 +192,24 @@ services:
   #     - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
   #     - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
   #   command: /root/shared_folder/xsens-launch.sh
+
+  foxglove:
+    build:
+      context: .
+      dockerfile: foxglove/foxglove.Dockerfile
+    container_name: foxglove
+    privileged: true
+    ports:
+      - "9092:9092"
+    networks:
+      - ros2-net
+    volumes:
+      - /dev/:/dev/
+      - /mnt/External Disk/rosbags/:/root/rosbags/
+      - ../ros2_ws/foxglove-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../ros2_ws/curt_description:/root/ros2_ws/src/curt_description
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      - DISPLAY=$DISPLAY
+    command: /root/shared_folder/foxglove-launch.sh

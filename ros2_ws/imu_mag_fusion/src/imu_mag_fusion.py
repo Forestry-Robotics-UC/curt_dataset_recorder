@@ -58,9 +58,9 @@ class IMUMagFusionNode(rclpy.node.Node):
         
         # Extract magnetometer (Tesla)
         mag = np.array([
-            self.mag_data.magnetic_field.x,
             self.mag_data.magnetic_field.y,
-            self.mag_data.magnetic_field.z
+            -self.mag_data.magnetic_field.x,
+            -self.mag_data.magnetic_field.z
         ])
         
         # Update quaternion using Madgwick filter pip package

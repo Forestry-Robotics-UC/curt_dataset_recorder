@@ -128,3 +128,5 @@ ouster/os_driver:
 
     phase_lock_enable: true
     phase_lock_offset: 0
+    sync_pulse_out_pulse_width: 50
+    multipurpose_io_mode: "OUTPUT_FROM_ENCODER_ANGLE"

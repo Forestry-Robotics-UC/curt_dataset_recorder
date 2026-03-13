@@ -20,7 +20,7 @@
     # camera_info_url: ''  # file:///abs/path/to/calibration.yaml
 
     # Advanced (optional)
-    debug: False
+    debug: false
     # debug_period_s: 1.0
     # gstreamer_pipeline: ''  # Optional override. Leave empty to auto-build from params.
     # reconnect_interval_s: 2.0  # retry open when camera is unplugged
