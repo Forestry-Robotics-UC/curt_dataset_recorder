@@ -46,7 +46,9 @@ RUN mkdir -p $CATKIN_WS/src
 #Install OpenEBA pkg
 WORKDIR $CATKIN_WS/src
 RUN git clone https://github.com/ros-event-camera/metavision_driver.git
-RUN vcs import < metavision_driver/metavision_driver.repos
+RUN git clone https://github.com/ros-event-camera/event_camera_renderer.git
+RUN git clone https://github.com/ros-event-camera/event_camera_codecs.git
+RUN git clone https://github.com/ros-event-camera/event_camera_msgs.git
 
 
 #Build workspace

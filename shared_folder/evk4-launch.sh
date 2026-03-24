@@ -19,5 +19,12 @@ source /root/ros2_ws/install/setup.bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 export HDF5_PLUGIN_PATH=$HDF5_PLUGIN_PATH:/usr/local/lib/hdf5/plugin  # On Ubuntu 24.04
 
-#Launch ouster driver
+#Launch evk4 renderer
+#ros2 launch event_camera_renderer renderer.launch.py &
+
+#Launch evk4 driver
 ros2 launch metavision_driver driver_composition.launch.py serial:="00051972"
+
+
+
+
