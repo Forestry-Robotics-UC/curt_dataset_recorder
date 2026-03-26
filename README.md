@@ -19,6 +19,7 @@ The entire data-acquisition system for the CURTmini is organized under:
 ├── ros2_ws/
 │   ├── curt_description/
 │   ├── imu_mag_fusion/
+│   ├── realsense_camera_info_override/
 │   ├── ouster-build/
 │   ├── emlid-build/
 │   ├── realsense-build/
@@ -179,6 +180,34 @@ Config file:
 Launch file:
 `realsense/rs_launch.py`
 
+Calibrated `camera_info` override:
+
+- Put the YAML produced by `camera_calibration` in `sensor_configs/realsense/`.
+- Set `REALSENSE_COLOR_CAMERA_INFO_URL` in `Docker/docker-compose.yml` to a `file:///` URL visible inside the container, for example:
+  `file:///root/sensor_configs/realsense/color_camera_info.yaml`
+- If you also want to replace `/camera/aligned_depth_to_color/camera_info`, set
+  `REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL` too. In many setups this
+  can point at the same color calibration YAML.
+- The launch now remaps the OEM topics to `.../camera_info_oem` and republishes
+  calibrated `camera_info` on the original topic names, so downstream nodes can
+  keep subscribing to `/camera/color/camera_info`.
+
+Compressed Compose variants:
+
+- `docker compose -f Docker/docker-compose.yml --profile realsense-png up realsense_png`
+- `docker compose -f Docker/docker-compose.yml --profile realsense-ffmpeg up realsense_ffmpeg`
+
+Default compressed topic:
+
+- `/camera/color/image_raw/compressed` for the PNG path
+- `/camera/color/image_raw/ffmpeg` for the ffmpeg path
+
+Notes:
+
+- The PNG path uses `compressed_image_transport` with `png`, so it is lossless.
+- The ffmpeg path uses `ffmpeg_image_transport` with `libx264` and `crf:0` for minimum loss, but it should still be treated as near-lossless rather than byte-identical.
+- By default only `/camera/color/image_raw` is republished. Override `REALSENSE_COMPRESS_TOPICS` in `Docker/docker-compose.yml` if you also want additional raw image topics republished through the same transport.
+
 ### 4.4 Xsens IMU
 
 Launch file:
@@ -195,6 +224,22 @@ Config files:
 `mapir/mapir_camera_params.yaml`
 `mapir/mapir_indices_params.yaml`
 `mapir/rviz_mapir_indices.rviz`
+
+Compressed Compose variants:
+
+- `docker compose -f Docker/docker-compose.yml --profile mapir-png up mapir_png`
+- `docker compose -f Docker/docker-compose.yml --profile mapir-ffmpeg up mapir_ffmpeg`
+
+Default compressed topic:
+
+- `/mapir/image_raw/compressed` for the PNG path
+- `/mapir/image_raw/ffmpeg` for the ffmpeg path
+
+Notes:
+
+- The PNG path uses `compressed_image_transport` with `png`, so it is lossless.
+- The ffmpeg path uses `ffmpeg_image_transport` with `libx264` and `crf:0` for minimum loss, but it should still be treated as near-lossless rather than byte-identical.
+- Override `MAPIR_COMPRESS_TOPICS` in `Docker/docker-compose.yml` if the MAPIR launch exposes additional raw image topics that you want republished.
 
 ### 4.7 RM3100
 

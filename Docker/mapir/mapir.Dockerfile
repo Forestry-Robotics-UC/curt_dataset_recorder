@@ -24,6 +24,8 @@ RUN apt update \
         gstreamer1.0-plugins-ugly \
         gstreamer1.0-libav \
         ros-jazzy-cv-bridge \
+        ros-jazzy-compressed-image-transport \
+        ros-jazzy-ffmpeg-image-transport \
         ros-jazzy-image-transport \
         ros-jazzy-camera-info-manager-py \
         ros-jazzy-camera-info-manager \

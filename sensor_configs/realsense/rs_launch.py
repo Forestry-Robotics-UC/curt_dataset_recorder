@@ -94,6 +94,8 @@ configurable_parameters = [{'name': 'camera_name',                  'default': '
                            {'name': 'base_frame_id',                'default': 'link', 'description': 'Root frame of the sensors transform tree'},
                            {'name': 'color_qos',                    'default': 'SENSOR_DATA', 'description': 'Change QOS'},
                            {'name': 'depth_qos',                    'default': 'SENSOR_DATA', 'description': 'Change QOS'},
+                           {'name': 'color_camera_info_url',        'default': "''", 'description': 'file:/// calibration YAML used to override the OEM color camera_info topic'},
+                           {'name': 'aligned_depth_to_color_camera_info_url', 'default': "''", 'description': 'file:/// calibration YAML used to override the OEM aligned_depth_to_color camera_info topic'},
 
                           ]
 
@@ -107,6 +109,32 @@ def yaml_to_dict(path_to_yaml):
     with open(path_to_yaml, "r") as f:
         return yaml.load(f, Loader=yaml.SafeLoader)
 
+def normalize_launch_value(value):
+    return value.strip()
+
+def camera_root(camera_namespace, camera_name):
+    parts = [
+        normalize_launch_value(value).strip('/')
+        for value in (camera_namespace, camera_name)
+        if normalize_launch_value(value) and normalize_launch_value(value) != "''"
+    ]
+    return '/' + '/'.join(parts)
+
+def camera_info_override_node(name, input_topic, output_topic, camera_info_url, output, log_level):
+    return launch_ros.actions.Node(
+        package='realsense_camera_info_override',
+        executable='camera_info_override.py',
+        name=name,
+        parameters=[{
+            'input_topic': input_topic,
+            'output_topic': output_topic,
+            'camera_info_url': camera_info_url,
+        }],
+        output=output,
+        arguments=['--ros-args', '--log-level', log_level],
+        emulate_tty=True,
+    )
+
 def launch_setup(context, params, param_name_suffix=''):
     _config_file = LaunchConfiguration('config_file' + param_name_suffix).perform(context)
     params_from_file = {} if _config_file == "''" else yaml_to_dict(_config_file)
@@ -118,17 +146,54 @@ def launch_setup(context, params, param_name_suffix=''):
     lifecycle_params = yaml_to_dict(lifecycle_param_file)
     use_lifecycle_node = lifecycle_params.get("use_lifecycle_node", False)
 
-    _output = LaunchConfiguration('output' + param_name_suffix)
+    _output = LaunchConfiguration('output' + param_name_suffix).perform(context)
+    _log_level = LaunchConfiguration('log_level' + param_name_suffix).perform(context)
+    _camera_name = LaunchConfiguration('camera_name' + param_name_suffix).perform(context)
+    _camera_namespace = LaunchConfiguration('camera_namespace' + param_name_suffix).perform(context)
+    _color_camera_info_url = LaunchConfiguration('color_camera_info_url' + param_name_suffix).perform(context)
+    _aligned_camera_info_url = LaunchConfiguration('aligned_depth_to_color_camera_info_url' + param_name_suffix).perform(context)
+    _camera_root = camera_root(_camera_namespace, _camera_name)
+    remappings = []
+    extra_nodes = []
 
     # Dynamically choose Node or LifecycleNode
     node_action = launch_ros.actions.LifecycleNode if use_lifecycle_node else launch_ros.actions.Node
     log_message = "Launching as LifecycleNode" if use_lifecycle_node else "Launching as Normal ROS Node"
 
-    if(os.getenv('ROS_DISTRO') == 'foxy'):
-        # Foxy doesn't support output as substitution object (LaunchConfiguration object)
-        # but supports it as string, so we fetch the string from this substitution object
-        # see related PR that was merged for humble, iron, rolling: https://github.com/ros2/launch/pull/577
-        _output = context.perform_substitution(_output)
+    if _color_camera_info_url != "''":
+        color_topic = f'{_camera_root}/color/camera_info'
+        color_oem_topic = f'{_camera_root}/color/camera_info_oem'
+        remappings.append((color_topic, color_oem_topic))
+        extra_nodes.append(LogInfo(
+            msg=f'Using calibrated color CameraInfo from {_color_camera_info_url}'
+        ))
+        extra_nodes.append(camera_info_override_node(
+            name='color_camera_info_override',
+            input_topic=color_oem_topic,
+            output_topic=color_topic,
+            camera_info_url=_color_camera_info_url,
+            output=_output,
+            log_level=_log_level,
+        ))
+
+    if _aligned_camera_info_url != "''":
+        aligned_topic = f'{_camera_root}/aligned_depth_to_color/camera_info'
+        aligned_oem_topic = f'{_camera_root}/aligned_depth_to_color/camera_info_oem'
+        remappings.append((aligned_topic, aligned_oem_topic))
+        extra_nodes.append(LogInfo(
+            msg=(
+                'Using calibrated aligned_depth_to_color CameraInfo from '
+                f'{_aligned_camera_info_url}'
+            )
+        ))
+        extra_nodes.append(camera_info_override_node(
+            name='aligned_depth_to_color_camera_info_override',
+            input_topic=aligned_oem_topic,
+            output_topic=aligned_topic,
+            camera_info_url=_aligned_camera_info_url,
+            output=_output,
+            log_level=_log_level,
+        ))
 
     return [
         LogInfo(msg=f"🚀 {log_message}"),
@@ -139,10 +204,11 @@ def launch_setup(context, params, param_name_suffix=''):
             executable='realsense2_camera_node',
             parameters=[params, params_from_file],
             output=_output,
-            arguments=['--ros-args', '--log-level', LaunchConfiguration('log_level' + param_name_suffix)],
+            arguments=['--ros-args', '--log-level', _log_level],
+            remappings=remappings,
             emulate_tty=True,
             )
-    ]
+    ] + extra_nodes
 
 def generate_launch_description():
     return LaunchDescription(declare_configurable_parameters(configurable_parameters) + [

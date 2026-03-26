@@ -12,6 +12,8 @@ RUN apt update \
     ros-jazzy-diagnostic-updater \
     ros-jazzy-librealsense* \
     ros-jazzy-cv-bridge \
+    ros-jazzy-compressed-image-transport \
+    ros-jazzy-ffmpeg-image-transport \
     ros-jazzy-image-transport \
     ros-jazzy-rmw-cyclonedds-cpp
 
