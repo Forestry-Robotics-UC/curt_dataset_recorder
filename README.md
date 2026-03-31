@@ -1,3 +1,5 @@
+This repository provides a pipeline to record datasets with CURTmini robot. For a detailed instruction manual, please check the [Wiki](https://github.com/Forestry-Robotics-UC/curt_dataset_recorder/wiki)!
+
 ## 1. System Architecture
 
 The entire data-acquisition system for the CURTmini is organized under:
@@ -15,6 +17,7 @@ The entire data-acquisition system for the CURTmini is organized under:
 │   ├── mapir/
 │   ├── openzen/
 │   ├── rm3100/
+│   ├── foxglove/
 │   └── docker-compose.yml
 ├── ros2_ws/
 │   ├── curt_description/
@@ -40,8 +43,9 @@ The entire data-acquisition system for the CURTmini is organized under:
 │   ├── evk4-launch.sh
 │   ├── mapir-launch.sh
 │   ├── openzen-launch.sh
-│   └── rm3100-launch.sh
-├──sensor_configs/
+│   ├── rm3100-launch.sh
+│   └── foxglove-launch.sh
+├── sensor_configs/
 │   ├── ouster/
 │   ├── emlid/
 │   ├── realsense/
@@ -66,16 +70,15 @@ Each sensor package has its own Dockerfile inside its corresponding directory:
 - **openzen/** → CURTmini internal IMU
 - **rm3100/** → RM3100 Magnetometer
 - **recorder/** → hector_recorder
+- **foxglove/** → Foxglove and RViZ docker containers
 
 A **docker-compose.yml** file creates all containers for the sensors and the recording.
 
 ### 1.2 Shared ROS 2 Workspace
 
-The directory **ros2_ws/** is a workspace shared across all containers. Each container mounts:
+The directory ```ros2_ws/``` is a workspace shared across all containers. Each container mounts:
 
-- **ros2_ws/<sensor>-build/** → Build folder of each container
-
-This prevents each container from rebuilding the full workspace and allows faster startup.
+- **ros2_ws/<sensor>-build/** → Build folder of each container This prevents each container from rebuilding the full workspace and allows faster startup. This directory also contains two packages that are being shared to the containers:
 
 ### 1.3 Shared Entry-Point Scripts
 
@@ -93,11 +96,11 @@ This folder has every configuration needed to each sensor. Every sensor has its 
 
 ### 1.5 CURTmini URDF Package
 
-This folder, inside ros2_ws/, has the package needed to launch the CURTmini URDF with all the sensors.
+This folder, inside ```ros2_ws/```, has the package needed to launch the CURTmini URDF with all the sensors.
 
 ### 1.6 IMU - Magnetometer Fusion Package
 
-This directory, inside ros2_ws/, contains the package responsible for fusing data from the internal IMU (OpenZen) with the RM3100 magnetometer to compute the Attitude and Heading Reference System (AHRS). The fused output is published to the /imu/fused topic at a frequency of 500 Hz. Configuration options, topic names, can be adjusted in the parameters.yaml file located within the config/ subdirectory.
+This directory, inside ```ros2_ws/```, contains the package responsible for fusing data from the internal **OpenZen IMU** with the **RM3100 magnetometer** to compute the **Attitude and Heading Reference System (AHRS)**. The fused output is published to the ```/imu/fused``` topic at a frequency of ```500 Hz```. Configuration options, topic names, can be adjusted in the parameters.yaml file located within the config/ subdirectory.
 
 ---
 
@@ -140,7 +143,7 @@ Run the script **startup.sh** to start all the system components. The script wil
 Current recording topics:
 
 ```text
-/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /camera/imu /imu/data /imu/mag /imu/fused /event_camera/events /mapir/camera_info /mapir/image_raw /mapir/indices/ndvi /fix /tf /tf_static /robot_description /mag
+/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /camera/imu /imu/data /imu/mag /imu/fused /event_camera/events /mapir/camera_info /mapir/image_raw /fix /tf /tf_static /mag
 ```
 
 To modify what is recorded:
