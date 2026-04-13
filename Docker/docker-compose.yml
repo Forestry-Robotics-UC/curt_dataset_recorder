@@ -9,77 +9,6 @@ networks:
         - subnet: 169.254.0.0/16
           gateway: 169.254.0.1
 
-x-realsense-common: &realsense-common
-  image: docker-realsense:latest
-  build:
-    context: .
-    dockerfile: realsense/realsense.Dockerfile
-  privileged: true
-  networks:
-    - ros2-net
-  environment:
-    # file:/// URL for the calibrated replacement of /camera/color/camera_info
-    REALSENSE_COLOR_CAMERA_INFO_URL: ""
-    # Optional file:/// URL for the replacement of /camera/aligned_depth_to_color/camera_info
-    REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
-    # Compression sidecar mode: none, compressed (PNG), or ffmpeg
-    REALSENSE_COMPRESS_MODE: "none"
-    # Comma-separated raw image topics to republish through the selected transport
-    REALSENSE_COMPRESS_TOPICS: "/camera/color/image_raw"
-    # PNG compression effort for the compressed_image_transport path
-    COMPRESS_PNG_LEVEL: "1"
-    # ffmpeg encoder used by the ffmpeg_image_transport path
-    COMPRESS_FFMPEG_ENCODER: "libx264"
-    # Near-lossless ffmpeg settings; prefer CRF 0 for minimum loss
-    COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,tune:zerolatency,crf:0"
-    # ffmpeg target bitrate in bits/s
-    COMPRESS_FFMPEG_BIT_RATE: "20000000"
-    # ffmpeg GOP size in frames
-    COMPRESS_FFMPEG_GOP_SIZE: "10"
-    # ffmpeg maximum quantizer; lower is less lossy
-    COMPRESS_FFMPEG_QMAX: "1"
-  volumes:
-    - /dev/:/dev/
-    - ../ros2_ws/realsense-build:/root/ros2_ws/build
-    - ../shared_folder/:/root/shared_folder/
-    - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
-    - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
-    - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
-  command: /root/shared_folder/realsense-launch.sh
-
-x-mapir-common: &mapir-common
-  image: docker-mapir:latest
-  build:
-    context: .
-    dockerfile: mapir/mapir.Dockerfile
-  privileged: true
-  networks:
-    - ros2-net
-  environment:
-    # Compression sidecar mode: none, compressed (PNG), or ffmpeg
-    MAPIR_COMPRESS_MODE: "none"
-    # Comma-separated raw image topics to republish through the selected transport
-    MAPIR_COMPRESS_TOPICS: "/mapir/image_raw"
-    # PNG compression effort for the compressed_image_transport path
-    COMPRESS_PNG_LEVEL: "1"
-    # ffmpeg encoder used by the ffmpeg_image_transport path
-    COMPRESS_FFMPEG_ENCODER: "libx264"
-    # Near-lossless ffmpeg settings; prefer CRF 0 for minimum loss
-    COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,tune:zerolatency,crf:0"
-    # ffmpeg target bitrate in bits/s
-    COMPRESS_FFMPEG_BIT_RATE: "20000000"
-    # ffmpeg GOP size in frames
-    COMPRESS_FFMPEG_GOP_SIZE: "10"
-    # ffmpeg maximum quantizer; lower is less lossy
-    COMPRESS_FFMPEG_QMAX: "1"
-  volumes:
-    - /dev/:/dev/
-    - ../ros2_ws/mapir-build:/root/ros2_ws/build
-    - ../shared_folder/:/root/shared_folder/
-    - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
-    - /home/curt/Documents/Duda/mapir-camera-ros2:/root/ros2_ws/src/mapir-camera-ros2:ro
-  command: /root/shared_folder/mapir-launch.sh
-
 services:
   openzen:
     image: docker-openzen:latest
@@ -135,38 +64,92 @@ services:
     command: /root/shared_folder/emlid-launch.sh
 
   realsense:
-    <<: *realsense-common
+    image: docker-realsense:latest
+    build:
+      context: .
+      dockerfile: realsense/realsense.Dockerfile
     container_name: realsense
-  realsense_png:
-    <<: *realsense-common
-    container_name: realsense-png
-    profiles: ["realsense-png"]
+    privileged: true
+    # profiles: ["realsense-raw"]
+    networks:
+      - ros2-net
     environment:
       REALSENSE_COLOR_CAMERA_INFO_URL: ""
       REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
-      REALSENSE_COMPRESS_MODE: "compressed"
+      REALSENSE_COMPRESS_MODE: "none"
       REALSENSE_COMPRESS_TOPICS: "/camera/color/image_raw"
       COMPRESS_PNG_LEVEL: "1"
-      COMPRESS_FFMPEG_ENCODER: "libx264"
-      COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,tune:zerolatency,crf:0"
+      COMPRESS_FFMPEG_ENCODER: "libx264rgb"
+      COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
       COMPRESS_FFMPEG_BIT_RATE: "20000000"
       COMPRESS_FFMPEG_GOP_SIZE: "10"
       COMPRESS_FFMPEG_QMAX: "1"
-  realsense_ffmpeg:
-    <<: *realsense-common
-    container_name: realsense-ffmpeg
-    profiles: ["realsense-ffmpeg"]
-    environment:
-      REALSENSE_COLOR_CAMERA_INFO_URL: ""
-      REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
-      REALSENSE_COMPRESS_MODE: "ffmpeg"
-      REALSENSE_COMPRESS_TOPICS: "/camera/color/image_raw"
-      COMPRESS_PNG_LEVEL: "1"
-      COMPRESS_FFMPEG_ENCODER: "libx264"
-      COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,tune:zerolatency,crf:0"
-      COMPRESS_FFMPEG_BIT_RATE: "20000000"
-      COMPRESS_FFMPEG_GOP_SIZE: "10"
-      COMPRESS_FFMPEG_QMAX: "1"
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/realsense-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
+      - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
+      - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+    command: /root/shared_folder/realsense-launch.sh
+  # realsense_png:
+  #   image: docker-realsense:latest
+  #   build:
+  #     context: .
+  #     dockerfile: realsense/realsense.Dockerfile
+  #   container_name: realsense-png
+  #   profiles: ["realsense-png"]
+  #   privileged: true
+  #   networks:
+  #     - ros2-net
+  #   environment:
+  #     REALSENSE_COLOR_CAMERA_INFO_URL: ""
+  #     REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
+  #     REALSENSE_COMPRESS_MODE: "compressed"
+  #     REALSENSE_COMPRESS_TOPICS: "/camera/color/image_raw"
+  #     COMPRESS_PNG_LEVEL: "1"
+  #     COMPRESS_FFMPEG_ENCODER: "libx264rgb"
+  #     COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
+  #     COMPRESS_FFMPEG_BIT_RATE: "20000000"
+  #     COMPRESS_FFMPEG_GOP_SIZE: "10"
+  #     COMPRESS_FFMPEG_QMAX: "1"
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/realsense-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
+  #     - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
+  #     - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+  #   command: /root/shared_folder/realsense-launch.sh
+  # realsense_ffmpeg:
+  #   image: docker-realsense:latest
+  #   build:
+  #     context: .
+  #     dockerfile: realsense/realsense.Dockerfile
+  #   container_name: realsense-ffmpeg
+  #   #profiles: ["realsense-ffmpeg"]
+  #   privileged: true
+  #   networks:
+  #     - ros2-net
+  #   environment:
+  #     REALSENSE_COLOR_CAMERA_INFO_URL: ""
+  #     REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
+  #     REALSENSE_COMPRESS_MODE: "ffmpeg"
+  #     REALSENSE_COMPRESS_TOPICS: "/camera/color/image_raw"
+  #     COMPRESS_PNG_LEVEL: "1"
+  #     COMPRESS_FFMPEG_ENCODER: "libx264rgb"
+  #     COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
+  #     COMPRESS_FFMPEG_BIT_RATE: "20000000"
+  #     COMPRESS_FFMPEG_GOP_SIZE: "10"
+  #     COMPRESS_FFMPEG_QMAX: "1"
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/realsense-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
+  #     - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
+  #     - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+  #   command: /root/shared_folder/realsense-launch.sh
 
   ouster:
     image: docker-ouster:latest
@@ -187,35 +170,87 @@ services:
       - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/ouster-ros/config/driver_params.yaml:rw
     command: /root/shared_folder/ouster-launch.sh
 
-  mapir:
-    <<: *mapir-common
-    container_name: mapir
-  mapir_png:
-    <<: *mapir-common
-    container_name: mapir-png
-    profiles: ["mapir-png"]
-    environment:
-      MAPIR_COMPRESS_MODE: "compressed"
-      MAPIR_COMPRESS_TOPICS: "/mapir/image_raw"
-      COMPRESS_PNG_LEVEL: "1"
-      COMPRESS_FFMPEG_ENCODER: "libx264"
-      COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,tune:zerolatency,crf:0"
-      COMPRESS_FFMPEG_BIT_RATE: "20000000"
-      COMPRESS_FFMPEG_GOP_SIZE: "10"
-      COMPRESS_FFMPEG_QMAX: "1"
+  # mapir:
+  #   image: docker-mapir:latest
+  #   build:
+  #     context: .
+  #     dockerfile: mapir/mapir.Dockerfile
+  #   container_name: mapir
+  #   privileged: true
+  #   profiles: ["mapir-raw"]
+  #   networks:
+  #     - ros2-net
+  #   environment:
+  #     MAPIR_COMPRESS_MODE: "none"
+  #     MAPIR_COMPRESS_TOPICS: "/mapir/image_raw"
+  #     COMPRESS_PNG_LEVEL: "1"
+  #     COMPRESS_FFMPEG_ENCODER: "libx264rgb"
+  #     COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
+  #     COMPRESS_FFMPEG_BIT_RATE: "20000000"
+  #     COMPRESS_FFMPEG_GOP_SIZE: "10"
+  #     COMPRESS_FFMPEG_QMAX: "1"
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/mapir-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
+  #     - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
+  #     - ../sensor_configs/mapir/mapir_camera.launch.py:/root/ros2_ws/src/mapir-camera-ros2/launch/mapir_camera.launch.py:rw
+  #   command: /root/shared_folder/mapir-launch.sh
+  # mapir_png:
+  #   image: docker-mapir:latest
+  #   build:
+  #     context: .
+  #     dockerfile: mapir/mapir.Dockerfile
+  #   container_name: mapir-png
+  #   profiles: ["mapir-png"]
+  #   privileged: true
+  #   networks:
+  #     - ros2-net
+  #   environment:
+  #     MAPIR_COMPRESS_MODE: "compressed"
+  #     MAPIR_COMPRESS_TOPICS: "/mapir/image_raw"
+  #     COMPRESS_PNG_LEVEL: "1"
+  #     COMPRESS_FFMPEG_ENCODER: "libx264rgb"
+  #     COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
+  #     COMPRESS_FFMPEG_BIT_RATE: "20000000"
+  #     COMPRESS_FFMPEG_GOP_SIZE: "10"
+  #     COMPRESS_FFMPEG_QMAX: "1"
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/mapir-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
+  #     - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
+  #     - ../sensor_configs/mapir/mapir_camera.launch.py:/root/ros2_ws/src/mapir-camera-ros2/launch/mapir_camera.launch.py:rw
+  #   command: /root/shared_folder/mapir-launch.sh
   mapir_ffmpeg:
-    <<: *mapir-common
+    image: docker-mapir:latest
+    build:
+      context: .
+      dockerfile: mapir/mapir.Dockerfile
     container_name: mapir-ffmpeg
-    profiles: ["mapir-ffmpeg"]
+    #profiles: ["mapir-ffmpeg"]
+    privileged: true
+    networks:
+      - ros2-net
     environment:
       MAPIR_COMPRESS_MODE: "ffmpeg"
       MAPIR_COMPRESS_TOPICS: "/mapir/image_raw"
       COMPRESS_PNG_LEVEL: "1"
-      COMPRESS_FFMPEG_ENCODER: "libx264"
-      COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,tune:zerolatency,crf:0"
+      COMPRESS_FFMPEG_ENCODER: "libx264rgb"
+      COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
       COMPRESS_FFMPEG_BIT_RATE: "20000000"
       COMPRESS_FFMPEG_GOP_SIZE: "10"
       COMPRESS_FFMPEG_QMAX: "1"
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/mapir-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
+      - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
+      - ../sensor_configs/mapir/mapir_camera.launch.py:/root/ros2_ws/src/mapir-camera-ros2/launch/mapir_camera.launch.py:rw
+    command: /root/shared_folder/mapir-launch.sh
 
   curt:
     image: docker-curt:latest

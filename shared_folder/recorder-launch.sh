@@ -13,11 +13,35 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 # Source ROS2 Jazzy
 source /opt/ros/jazzy/setup.bash
 
-#Build workspace only with the packages discriminated on docker compose file
+# Build only the recorder and custom message packages needed at runtime.
+# This avoids pulling in full sensor driver builds like ouster_ros.
 cd /root/ros2_ws/
-colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+colcon build --symlink-install \
+  --packages-select \
+    hector_recorder_msgs \
+    hector_recorder \
+    ouster_sensor_msgs \
+  --cmake-args -DCMAKE_BUILD_TYPE=Release
 source /root/ros2_ws/install/setup.bash
 sleep 10
+
+wait_for_topic() {
+  local topic="$1"
+  local timeout_s="${2:-30}"
+  local i=0
+
+  while [ "$i" -lt "$timeout_s" ]; do
+    if ros2 topic list 2>/dev/null | grep -Fx "$topic" >/dev/null; then
+      echo "Found topic: $topic"
+      return 0
+    fi
+    sleep 1
+    i=$((i + 1))
+  done
+
+  echo "Timed out waiting for topic: $topic"
+  return 1
+}
 
 #Database of random names to bags
 names_dir="/root/shared_folder"
@@ -42,8 +66,8 @@ BAG_NAME="$(date +%Y_%m_%d_%H_%M_%S)__${label}_"
 
 #Topics to record
 #Ouster Points /ouster/points /ouster/imu 
-TOPICS="/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /camera/imu /imu/data /imu/mag /imu/fused /event_camera/events /mapir/camera_info /mapir/image_raw /fix /tf /tf_static /mag"
-#TOPICS="/ouster/points /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /imu/data /imu/mag /imu/fused /mapir/camera_info /mapir/image_raw /fix /tf /tf_static /mag"
+TOPICS="/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw /camera/color/metadata /camera/color/camera_info /camera/imu /imu/data /imu/mag /imu/fused /event_camera/events /mapir/camera_info /mapir/image_raw/ffmpeg /fix /tf /tf_static /mag"
+#TOPICS="/ouster/points /ouster/metadata /camera/color/image_raw/ffmpeg /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /imu/data /imu/mag /imu/fused /mapir/camera_info /mapir/image_raw/ffmpeg /fix /tf /tf_static /mag"
 
 
 mkdir -p "$BAG_DIR"

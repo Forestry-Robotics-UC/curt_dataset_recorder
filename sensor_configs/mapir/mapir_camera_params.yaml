@@ -9,10 +9,10 @@
     # Common (most users)
     video_device: /dev/mapir  # '/dev/videoX' or numeric index string
     pixel_format: MJPG  # MJPG or H264 (device-dependent)
-    use_gstreamer: true  # recommended for MJPG/H264 decode on most systems
-    image_width: 1280
-    image_height: 720
-    framerate: 30.0
+    use_gstreamer: false  # recommended for MJPG/H264 decode on most systems
+    image_width: 1920
+    image_height: 1080
+    framerate: 20.0
 
     # Frames / calibration
     frame_id: mapir3_optical_frame
@@ -20,7 +20,7 @@
     # camera_info_url: ''  # file:///abs/path/to/calibration.yaml
 
     # Advanced (optional)
-    debug: false
+    debug: true
     # debug_period_s: 1.0
     # gstreamer_pipeline: ''  # Optional override. Leave empty to auto-build from params.
     # reconnect_interval_s: 2.0  # retry open when camera is unplugged

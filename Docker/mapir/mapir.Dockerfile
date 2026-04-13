@@ -49,7 +49,7 @@ RUN mkdir -p ${ROS2_WS}/src
 
 WORKDIR ${ROS2_WS}/src
 # Mount or clone mapir_camera into ${ROS2_WS}/src/mapir_camera.
-# RUN git clone -b curt https://github.com/Forestry-Robotics-UC/mapir-camera-ros2
+RUN git clone -b curt https://github.com/Forestry-Robotics-UC/mapir-camera-ros2
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc
 RUN echo "source /root/ros2_ws/install/setup.bash" >> /root/.bashrc

@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-xhost +
 
 # Cleanup function
 cleanup() {
@@ -50,6 +49,7 @@ cleanup() {
     
     # Eliminate containers
     docker compose down
+    docker rm mapir-ffmpeg mapir-png realsense-ffmpeg realsense-png >/dev/null 2>&1 || true
     
     return $exit_code
 }
@@ -69,7 +69,7 @@ cd $SCRIPT_DIR/Docker
 
 # Start container
 echo "Starting container..."
-docker compose up -d --scale evk4=0 --scale foxglove=0
+docker compose up -d --scale evk4=0 --scale foxglove=0 &
 
 # Wait for container to be ready
 sleep 4

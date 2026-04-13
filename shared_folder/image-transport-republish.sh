@@ -41,22 +41,28 @@ trap cleanup EXIT INT TERM
 
 for topic in "$@"; do
   [[ -n "${topic}" ]] || continue
+  topic_suffix="${topic#/}"
+  topic_suffix="${topic_suffix//\//_}"
 
   republish_cmd=(
     ros2 run image_transport republish --ros-args
+    -r __node:="image_republisher_${transport}_${topic_suffix}"
     -p in_transport:=raw
     -p out_transport:="${transport}"
     -r in:="${topic}"
-    -r out:="${topic}"
+    -p "qos_overrides.${topic}.subscription.reliability:=best_effort"
+    -p "qos_overrides.${topic}.subscription.durability:=volatile"
   )
 
   if [[ "${transport}" == "compressed" ]]; then
     republish_cmd+=(
+      -r /out/compressed:="${topic}/compressed"
       -p out.compressed.format:=png
       -p out.compressed.png_level:="${png_level}"
     )
   else
     republish_cmd+=(
+      -r /out/ffmpeg:="${topic}/ffmpeg"
       -p out.ffmpeg.encoder:="${ffmpeg_encoder}"
       -p out.ffmpeg.encoder_av_options:="${ffmpeg_encoder_av_options}"
       -p out.ffmpeg.bit_rate:="${ffmpeg_bit_rate}"

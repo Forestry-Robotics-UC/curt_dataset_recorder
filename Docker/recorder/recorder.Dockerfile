@@ -16,7 +16,8 @@ RUN apt update \
     libpcap-dev \
     libopencv-dev \
     libboost-all-dev \
-    libncurses-dev
+    libncurses-dev \
+    libzip-dev
 
 #Install ros2 pkg
 RUN apt -y install ros-jazzy-rmw-cyclonedds-cpp \
@@ -27,7 +28,9 @@ RUN apt -y install ros-jazzy-rmw-cyclonedds-cpp \
     ros-jazzy-realsense2-camera-msgs \
     ros-jazzy-pcl-ros \
     ros-jazzy-metavision-driver \
-    ros-jazzy-tf2-eigen
+    ros-jazzy-tf2-eigen \
+    ros-jazzy-compressed-image-transport \
+    ros-jazzy-ffmpeg-image-transport
 
 #Configure catkin workspace
 ENV CATKIN_WS=/root/ros2_ws
@@ -35,7 +38,8 @@ RUN mkdir -p $CATKIN_WS/src
 
 WORKDIR $CATKIN_WS/src
 
-RUN git clone -b ros2 --recurse-submodules https://github.com/ouster-lidar/ouster-ros.git
+#RUN git clone -b ros2 --recurse-submodules https://github.com/ouster-lidar/ouster-ros.git
+RUN git clone -b ros2 --recurse-submodules https://github.com/errorcodecritical/ouster-ros.git
 
 RUN git clone https://github.com/tu-darmstadt-ros-pkg/hector_recorder.git
 

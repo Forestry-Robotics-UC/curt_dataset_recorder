@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -e
 
 # ROS 2 Middleware Implementation
 
@@ -14,7 +14,13 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 source /opt/ros/jazzy/setup.bash
 
 # Build workspace only with the packages described on docker compose file
-ROS2_WS="${ROS2_WS:-/workspaces/ros2_ws}"
+ROS2_WS="${ROS2_WS:-/root/ros2_ws}"
+MAPIR_SRC_DIR="${ROS2_WS}/src/mapir-camera-ros2"
+mkdir -p "${ROS2_WS}/src"
+if [[ ! -d "${MAPIR_SRC_DIR}" ]]; then
+  echo "MAPIR source tree not found, cloning into ${MAPIR_SRC_DIR}"
+  git clone -b curt https://github.com/Forestry-Robotics-UC/mapir-camera-ros2 "${MAPIR_SRC_DIR}"
+fi
 cd "${ROS2_WS}"
 colcon build --symlink-install \
   --base-paths src/mapir-camera-ros2 \
