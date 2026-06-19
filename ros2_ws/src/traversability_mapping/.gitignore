@@ -1,0 +1,8 @@
+**.vscode**
+ThirdParty/Sophus/build
+traversability_mapping/build
+traversability_mapping_common/build
+build/
+install/
+log/
+.bash_history

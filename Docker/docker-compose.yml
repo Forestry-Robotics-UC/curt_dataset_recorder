@@ -1,33 +1,34 @@
-networks:
-  ros2-net:
-  link-local-net:
-    driver: macvlan
-    driver_opts:
-      parent: enp86s0  # Specify your parent network interface (e.g., enp86s0)
-    ipam:
-      config:
-        - subnet: 169.254.0.0/16
-          gateway: 169.254.0.1
+# networks:
+#   ros2-net:
+#   link-local-net:
+#     driver: macvlan
+#     driver_opts:
+#       parent: enp86s0  # Specify your parent network interface (e.g., enp86s0)
+#     ipam:
+#       config:
+#         - subnet: 169.254.0.0/16
+#           gateway: 169.254.0.1
 
 services:
-  openzen:
-    image: docker-openzen:latest
-    build:
-     context: .
-     dockerfile: openzen/openzen.Dockerfile
-    container_name: openzen
-    privileged: true
-    devices:
-      - "/dev/ttyUSB0:/dev/ttyUSB0"
-    networks:
-      - ros2-net
-    volumes:
-      - /dev/:/dev/
-      - ../ros2_ws/openzen-build:/root/ros2_ws/build
-      - ../shared_folder/:/root/shared_folder/
-      - ../sensor_configs/openzen/OpenZenNode.cpp:/root/ros2_ws/src/openzenros2/src/OpenZenNode.cpp
-      - ../sensor_configs/openzen/openzen_lpms.launch.py:/root/ros2_ws/src/openzenros2/launch/openzen_lpms.launch.py
-    command: /root/shared_folder/openzen-launch.sh
+  # openzen:
+  #   image: docker-openzen:latest
+  #   build:
+  #    context: .
+  #    dockerfile: openzen/openzen.Dockerfile
+  #   container_name: openzen
+  #   privileged: true
+  #   devices:
+  #     - "/dev/ttyUSB0:/dev/ttyUSB0"
+  #   network_mode: host
+  #   volumes:
+  #     - /dev/:/dev/
+  #     - ../ros2_ws/build/openzen-build:/root/ros2_ws/build
+  #     - ../shared_folder/:/root/shared_folder/
+  #     - ../sensor_configs/openzen/OpenZenNode.cpp:/root/ros2_ws/src/openzenros2/src/OpenZenNode.cpp
+  #     - ../sensor_configs/openzen/openzen_lpms.launch.py:/root/ros2_ws/src/openzenros2/launch/openzen_lpms.launch.py
+  #   #environment:
+  #     #- ROS_DOMAIN_ID=42
+  #   command: /root/shared_folder/openzen-launch.sh
 
   rm3100:
     build:
@@ -35,16 +36,17 @@ services:
       dockerfile: rm3100/rm3100.Dockerfile
     container_name: rm3100
     privileged: true
-    networks:
-      - ros2-net
+    network_mode: host
     volumes:
       - /dev/:/dev/
-      - ../ros2_ws/rm3100-build:/root/ros2_ws/build
+      - ../ros2_ws/build/rm3100-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/rm3100/params.yaml:/root/ros2_ws/src/go1_magnetometer_rm3100/config/params.yaml:rw
       - ../sensor_configs/rm3100/rm3100_driver.launch.py:/root/ros2_ws/src/go1_magnetometer_rm3100/launch/rm3100_driver.launch.py:rw
       - ../sensor_configs/rm3100/rm3100_driver.py:/root/ros2_ws/src/go1_magnetometer_rm3100/src/rm3100_driver.py:rw
-      - ../ros2_ws/imu_mag_fusion:/root/ros2_ws/src/imu_mag_fusion
+      - ../ros2_ws/src/imu_mag_fusion:/root/ros2_ws/src/imu_mag_fusion
+    environment:
+      - ROS_DOMAIN_ID=30
     command: /root/shared_folder/rm3100-launch.sh
 
   emlid:
@@ -53,14 +55,15 @@ services:
       dockerfile: emlid/emlid.Dockerfile
     container_name: emlid
     privileged: true
-    networks:
-      - ros2-net
+    network_mode: host
     volumes:
       - /dev/:/dev/
-      - ../ros2_ws/emlid-build:/root/ros2_ws/build
+      - ../ros2_ws/build/emlid-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/emlid/nmea_serial_driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/nodes/nmea_serial_driver.py:rw
       - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
+    environment:
+      - ROS_DOMAIN_ID=30
     command: /root/shared_folder/emlid-launch.sh
 
   realsense:
@@ -71,8 +74,7 @@ services:
     container_name: realsense
     privileged: true
     # profiles: ["realsense-raw"]
-    networks:
-      - ros2-net
+    network_mode: host
     environment:
       REALSENSE_COLOR_CAMERA_INFO_URL: ""
       REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
@@ -84,13 +86,14 @@ services:
       COMPRESS_FFMPEG_BIT_RATE: "20000000"
       COMPRESS_FFMPEG_GOP_SIZE: "10"
       COMPRESS_FFMPEG_QMAX: "1"
+      ROS_DOMAIN_ID: 30
     volumes:
       - /dev/:/dev/
-      - ../ros2_ws/realsense-build:/root/ros2_ws/build
+      - ../ros2_ws/build/realsense-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
       - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
-      - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+      - ../ros2_ws/src/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
     command: /root/shared_folder/realsense-launch.sh
   # realsense_png:
   #   image: docker-realsense:latest
@@ -115,11 +118,13 @@ services:
   #     COMPRESS_FFMPEG_QMAX: "1"
   #   volumes:
   #     - /dev/:/dev/
-  #     - ../ros2_ws/realsense-build:/root/ros2_ws/build
+  #     - ../ros2_ws/build/realsense-build:/root/ros2_ws/build
   #     - ../shared_folder/:/root/shared_folder/
   #     - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
   #     - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
-  #     - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+  #     - ../ros2_ws/src/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+    # environment:
+    #   #- ROS_DOMAIN_ID=42
   #   command: /root/shared_folder/realsense-launch.sh
   # realsense_ffmpeg:
   #   image: docker-realsense:latest
@@ -144,11 +149,13 @@ services:
   #     COMPRESS_FFMPEG_QMAX: "1"
   #   volumes:
   #     - /dev/:/dev/
-  #     - ../ros2_ws/realsense-build:/root/ros2_ws/build
+  #     - ../ros2_ws/build/realsense-build:/root/ros2_ws/build
   #     - ../shared_folder/:/root/shared_folder/
   #     - ../sensor_configs/realsense/:/root/sensor_configs/realsense/:rw
   #     - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
-  #     - ../ros2_ws/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+  #     - ../ros2_ws/src/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
+    # environment:
+    #   #- ROS_DOMAIN_ID=42
   #   command: /root/shared_folder/realsense-launch.sh
 
   ouster:
@@ -158,16 +165,16 @@ services:
       dockerfile: ouster/os.Dockerfile
     container_name: ouster
     privileged: true
-    networks:
-      - ros2-net
-      - link-local-net
-    ports:
-      - "7502:7502/udp"
-      - "7503:7503/udp"
+    network_mode: host
+    # ports:
+    #   - "7502:7502/udp"
+    #   - "7503:7503/udp"
     volumes:
-      - ../ros2_ws/ouster-build:/root/ros2_ws/build
+      - ../ros2_ws/build/ouster-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/ouster-ros/config/driver_params.yaml:rw
+    environment:
+      - ROS_DOMAIN_ID=30
     command: /root/shared_folder/ouster-launch.sh
 
   # mapir:
@@ -191,11 +198,13 @@ services:
   #     COMPRESS_FFMPEG_QMAX: "1"
   #   volumes:
   #     - /dev/:/dev/
-  #     - ../ros2_ws/mapir-build:/root/ros2_ws/build
+  #     - ../ros2_ws/build/mapir-build:/root/ros2_ws/build
   #     - ../shared_folder/:/root/shared_folder/
   #     - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
   #     - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
   #     - ../sensor_configs/mapir/mapir_camera.launch.py:/root/ros2_ws/src/mapir-camera-ros2/launch/mapir_camera.launch.py:rw
+    # environment:
+    #   #- ROS_DOMAIN_ID=42
   #   command: /root/shared_folder/mapir-launch.sh
   # mapir_png:
   #   image: docker-mapir:latest
@@ -218,11 +227,13 @@ services:
   #     COMPRESS_FFMPEG_QMAX: "1"
   #   volumes:
   #     - /dev/:/dev/
-  #     - ../ros2_ws/mapir-build:/root/ros2_ws/build
+  #     - ../ros2_ws/build/mapir-build:/root/ros2_ws/build
   #     - ../shared_folder/:/root/shared_folder/
   #     - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
   #     - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
   #     - ../sensor_configs/mapir/mapir_camera.launch.py:/root/ros2_ws/src/mapir-camera-ros2/launch/mapir_camera.launch.py:rw
+    # environment:
+    #   #- ROS_DOMAIN_ID=42
   #   command: /root/shared_folder/mapir-launch.sh
   mapir_ffmpeg:
     image: docker-mapir:latest
@@ -232,8 +243,7 @@ services:
     container_name: mapir-ffmpeg
     #profiles: ["mapir-ffmpeg"]
     privileged: true
-    networks:
-      - ros2-net
+    network_mode: host
     environment:
       MAPIR_COMPRESS_MODE: "ffmpeg"
       MAPIR_COMPRESS_TOPICS: "/mapir/image_raw"
@@ -243,9 +253,10 @@ services:
       COMPRESS_FFMPEG_BIT_RATE: "20000000"
       COMPRESS_FFMPEG_GOP_SIZE: "10"
       COMPRESS_FFMPEG_QMAX: "1"
+      ROS_DOMAIN_ID: 30
     volumes:
       - /dev/:/dev/
-      - ../ros2_ws/mapir-build:/root/ros2_ws/build
+      - ../ros2_ws/build/mapir-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/mapir/:/root/sensor_configs/mapir/:rw
       - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
@@ -259,12 +270,13 @@ services:
       dockerfile: curt/curt.Dockerfile
     container_name: curt
     privileged: true
-    networks:
-      - ros2-net
+    network_mode: host
     volumes:
-      - ../ros2_ws/curt-build:/root/ros2_ws/build
-      - ../ros2_ws/curt_description:/root/ros2_ws/src/curt_description
+      - ../ros2_ws/build/curt-build:/root/ros2_ws/build
+      - ../ros2_ws/src/curt_description:/root/ros2_ws/src/curt_description
       - ../shared_folder/:/root/shared_folder/
+    environment:
+      - ROS_DOMAIN_ID=30
     command: /root/shared_folder/curt-launch.sh
 
   recorder:
@@ -274,13 +286,14 @@ services:
       dockerfile: recorder/recorder.Dockerfile
     container_name: recorder
     privileged: true
-    networks:
-      - ros2-net
+    network_mode: host
     volumes:
       - /dev/:/dev/
       - ../../rosbags:/root/rosbags/
-      - ../ros2_ws/recorder-build:/root/ros2_ws/build
+      - ../ros2_ws/build/recorder-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
+    environment:
+      - ROS_DOMAIN_ID=30
     command: /root/shared_folder/recorder-launch.sh
 
   ## Extra Sensors
@@ -292,10 +305,11 @@ services:
       dockerfile: evk4/evk4.Dockerfile
     container_name: evk4
     privileged: true
-    networks:
-      - ros2-net
+    network_mode: host
     volumes:
       - ../shared_folder/:/root/shared_folder/
+    environment:
+      - ROS_DOMAIN_ID=30
     command:  /root/shared_folder/evk4-launch.sh
 
   # ikalibr:
@@ -311,6 +325,7 @@ services:
   #     - /tmp/.X11-unix:/tmp/.X11-unix
   #   environment:
   #     - DISPLAY=$DISPLAY
+      # #- ROS_DOMAIN_ID=42
   #   command: bin/bash
 
   # xsens:
@@ -323,11 +338,13 @@ services:
   #     - ros2-net
   #   volumes:
   #     - /dev/:/dev/
-  #     - ../ros2_ws/xsens-build:/root/ros2_ws/build
+  #     - ../ros2_ws/build/xsens-build:/root/ros2_ws/build
   #     - ../shared_folder/:/root/shared_folder/
   #     - ../sensor_configs/xsens/mtdevice.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtdevice.py:rw
   #     - ../sensor_configs/xsens/mtnode.py:/root/ros2_ws/src/norlab_xsens_driver/xsens_driver/mtnode.py:rw
   #     - ../sensor_configs/xsens/xsens_driver.launch.xml:/root/ros2_ws/src/norlab_xsens_driver/launch/xsens_driver.launch.xml:rw
+    # environment:
+    #   #- ROS_DOMAIN_ID=42
   #   command: /root/shared_folder/xsens-launch.sh
 
   foxglove:
@@ -336,17 +353,70 @@ services:
       dockerfile: foxglove/foxglove.Dockerfile
     container_name: foxglove
     privileged: true
-    ports:
-      - "9092:9092"
-    networks:
-      - ros2-net
+    # ports:
+    #   - "9092:9092"
+    network_mode: host
     volumes:
       - /dev/:/dev/
       - /mnt/External Disk/rosbags/:/root/rosbags/
-      - ../ros2_ws/foxglove-build:/root/ros2_ws/build
+      - ../ros2_ws/build/foxglove-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
-      - ../ros2_ws/curt_description:/root/ros2_ws/src/curt_description
+      - ../ros2_ws/src/curt_description:/root/ros2_ws/src/curt_description
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
       - DISPLAY=$DISPLAY
+      - ROS_DOMAIN_ID=30
     command: /root/shared_folder/foxglove-launch.sh
+    
+### NAVIGATION PIPELINE ###
+
+  traversability:
+    build:
+     context: .
+     dockerfile: traversability_mapping/traversability_mapping.Dockerfile
+    container_name: trav
+    privileged: true
+    network_mode: host
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/build/trav-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../ros2_ws/src/traversability_mapping:/root/ros2_ws/src/traversability_mapping
+    environment:
+      - ROS_DOMAIN_ID=30
+    command: /root/shared_folder/trav-launch.sh
+
+  glim:
+    build:
+     context: .
+     dockerfile: glim/glim.Dockerfile
+    container_name: glim
+    privileged: true
+    network_mode: host
+    volumes:
+      - /dev/:/dev/
+      - ../../rosbags/:/root/rosbags/
+      - ../ros2_ws/build/glim-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../ros2_ws/src/glim:/root/ros2_ws/src/glim
+      - ../ros2_ws/src/glim_ros2:/root/ros2_ws/src/glim_ros2
+      - ../ros2_ws/src/glim_ext:/root/ros2_ws/src/glim_ext
+    environment:
+      - ROS_DOMAIN_ID=30
+    command: /root/shared_folder/glim-launch.sh
+  
+  nav2:
+    build:
+      context: .
+      dockerfile: nav2/nav2.Dockerfile
+    container_name: nav2
+    network_mode: host
+    volumes:
+      - ../ros2_ws/build/nav2-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/nav2:/root/nav2
+      - ../sensor_configs/nav2/navigation_launch.py:/opt/ros/kilted/share/nav2_bringup/launch/navigation_launch.py:rw
+      - ../sensor_configs/nav2/bringup_launch.py:/opt/ros/kilted/share/nav2_bringup/launch/bringup_launch.py:rw
+    environment:
+      - ROS_DOMAIN_ID=30
+    command: /root/shared_folder/nav2-launch.sh
