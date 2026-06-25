@@ -70,7 +70,7 @@ cd $SCRIPT_DIR/Docker
 
 # Start container
 echo "Starting container..."
-docker compose up -d --scale recorder=0 --scale evk4=0 --scale foxglove=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 &
+docker compose up -d --scale recorder=0 --scale evk4=0 --scale foxglove=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 --scale hmr_localisation=0 &
 
 # Wait for container to be ready
 sleep 4

@@ -80,7 +80,7 @@ public:
         // publish local occupancy and elevation grid map
         // pubOccupancyMapLocal = nh.advertise<nav_msgs::OccupancyGrid>("/occupancy_map_local", 5);
         // pubOccupancyMapLocalHeight = nh.advertise<elevation_msgs::OccupancyElevation>("/occupancy_map_local_height", 5);
-        pubOccupancyMapLocal = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/occupancy_map_local", 5);
+        pubOccupancyMapLocal = this->create_publisher<nav_msgs::msg::OccupancyGrid>("/occupancy_map_local", rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local());
         pubOccupancyMapLocalHeight = this->create_publisher<elevation_msgs::msg::OccupancyElevation>("/occupancy_map_local_height", 5);
 
         // publish elevation map for visualization

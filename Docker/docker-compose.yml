@@ -386,6 +386,22 @@ services:
       - ROS_DOMAIN_ID=30
     command: /root/shared_folder/trav_ros2-launch.sh
 
+  hmr_localisation:
+    build:
+     context: .
+     dockerfile: hmr_localisation/hmr.Dockerfile
+    container_name: hmr_localisation
+    privileged: true
+    network_mode: host
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/build/hmr-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/hmr_localisation/gt_ouster_ndt.yaml:/root/ros2_ws/src/hmr_localisation/config/gt_ouster_ndt.yaml:rw
+    environment:
+      - ROS_DOMAIN_ID=30
+    command: /root/shared_folder/hmr-launch.sh
+
   glim:
     build:
      context: .
