@@ -32,6 +32,6 @@
     // Optimizer params
     "validate_imu": true,
     "save_imu_rate_trajectory": true,
-    "num_threads": 2
+    "num_threads": 12
   }
 }

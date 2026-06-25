@@ -1,1 +1,0 @@
-traversability_msgs/KeyFrame[] keyframes

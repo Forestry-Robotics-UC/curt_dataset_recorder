@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-#ROS 2 Middleware Implementation 
+#ROS 2 Middleware Implementation
 
 #Fastrtps
 #export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -20,10 +20,5 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 # Source ROS2 Workspace
 source /root/ros2_ws/install/setup.bash
 
-#ros2 bag play /root/rosbags/2026_06_19_18_19_06__kalhan-map-test-2_ &
-#ros2 bag play /root/rosbags/2026_06_22_16_29_43__lab-test_ &
-
-# Run Foxglove server
-#ros2 launch foxglove_bridge foxglove_bridge_launch.xml port:=9092
-
-rviz2 -d /root/shared_folder/isr.rviz
+#Run traversability_mapping_ros2 pkg
+ros2 launch traversability_mapping offline.launch.py

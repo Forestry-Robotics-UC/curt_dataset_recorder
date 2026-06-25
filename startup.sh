@@ -60,6 +60,7 @@ trap cleanup EXIT
 # Bring up the network connection (if needed)
 #sudo nmcli connection up Ouster
 
+
 # Kill the ROS2 openzen IMU node from host (if needed)
 sudo pkill -f "openzen_node" || true
 
@@ -69,7 +70,7 @@ cd $SCRIPT_DIR/Docker
 
 # Start container
 echo "Starting container..."
-docker compose up -d --scale recorder=0 --scale evk4=0 --scale foxglove=0 --scale glim=0 --scale traversability=0 --scale nav2=0 &
+docker compose up -d --scale recorder=0 --scale evk4=0 --scale foxglove=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 &
 
 # Wait for container to be ready
 sleep 4
