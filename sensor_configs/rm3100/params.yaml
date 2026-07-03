@@ -41,13 +41,13 @@ rm3100_driver:
     
     # --- ROS Topics & Frames ---
     # TF frame ID for the magnetometer
-    frame_id: 'mag'
+    frame_id: 'mag_curt'
     
     # Topic names for publications
-    mag_topic: 'mag'
-    compass_topic: 'mag/compass'
-    azimuth_topic: 'mag/compass/azimuth'
-    azimuth_var_topic: 'mag/compass/azimuth_var'
+    mag_topic: 'curt/mag'
+    compass_topic: 'curt/mag/compass'
+    azimuth_topic: 'curt/mag/compass/azimuth'
+    azimuth_var_topic: 'curt/mag/compass/azimuth_var'
     
     # --- Publication Toggles ---
     # Enable/Disable specific publishers

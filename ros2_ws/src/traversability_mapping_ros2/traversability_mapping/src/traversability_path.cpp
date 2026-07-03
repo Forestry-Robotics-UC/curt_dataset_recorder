@@ -249,7 +249,7 @@ public:
         // 2. Transform local paths to global paths
         std::this_thread::sleep_for(std::chrono::milliseconds(500)); // sleep for a second
         try {
-            transform = tf_buffer->lookupTransform("map", "base_link", this->now(), rclcpp::Duration::from_seconds(0.1));
+            transform = tf_buffer->lookupTransform("map", "base_link_curt", this->now(), rclcpp::Duration::from_seconds(0.1));
         } catch (tf2::TransformException &ex) {
             RCLCPP_ERROR(this->get_logger(), "Transform Error! Path -> updatePathLibrary() %s", ex.what());
             std::this_thread::sleep_for(std::chrono::milliseconds(500));

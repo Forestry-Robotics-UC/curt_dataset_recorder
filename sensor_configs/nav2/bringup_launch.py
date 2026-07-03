@@ -23,7 +23,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.descriptions import ParameterFile
-from nav2_common.launch import LaunchConfigAsBool, RewrittenYaml
+from nav2_common.launch import RewrittenYaml  # Removed LaunchConfigAsBool
 
 
 def generate_launch_description() -> LaunchDescription:
@@ -32,23 +32,24 @@ def generate_launch_description() -> LaunchDescription:
     launch_dir = os.path.join(bringup_dir, 'launch')
 
     # Create the launch configuration variables
+    # All as LaunchConfiguration (not LaunchConfigAsBool)
     namespace = LaunchConfiguration('namespace')
-    slam = LaunchConfigAsBool('slam')
+    slam = LaunchConfiguration('slam')
     map_yaml_file = LaunchConfiguration('map')
     keepout_mask_yaml_file = LaunchConfiguration('keepout_mask')
     speed_mask_yaml_file = LaunchConfiguration('speed_mask')
     graph_filepath = LaunchConfiguration('graph')
-    use_sim_time = LaunchConfigAsBool('use_sim_time')
+    use_sim_time = LaunchConfiguration('use_sim_time')
     params_file = LaunchConfiguration('params_file')
-    autostart = LaunchConfigAsBool('autostart')
-    use_composition = LaunchConfigAsBool('use_composition')
-    use_intra_process_comms = LaunchConfigAsBool('use_intra_process_comms')
+    autostart = LaunchConfiguration('autostart')
+    use_composition = LaunchConfiguration('use_composition')
+    use_intra_process_comms = LaunchConfiguration('use_intra_process_comms')
     container_name = LaunchConfiguration('container_name')
-    use_respawn = LaunchConfigAsBool('use_respawn')
+    use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
-    use_localization = LaunchConfigAsBool('use_localization')
-    use_keepout_zones = LaunchConfigAsBool('use_keepout_zones')
-    use_speed_zones = LaunchConfigAsBool('use_speed_zones')
+    use_localization = LaunchConfiguration('use_localization')
+    use_keepout_zones = LaunchConfiguration('use_keepout_zones')
+    use_speed_zones = LaunchConfiguration('use_speed_zones')
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
@@ -74,7 +75,7 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     declare_namespace_cmd = DeclareLaunchArgument(
-        'namespace', default_value='', description='Top-level namespace'
+        'namespace', default_value='curt', description='Top-level namespace'
     )
 
     declare_slam_cmd = DeclareLaunchArgument(
@@ -101,17 +102,17 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     declare_use_localization_cmd = DeclareLaunchArgument(
-        'use_localization', default_value='True',
+        'use_localization', default_value='False',
         description='Whether to enable localization or not'
     )
 
     declare_use_keepout_zones_cmd = DeclareLaunchArgument(
-        'use_keepout_zones', default_value='True',
+        'use_keepout_zones', default_value='False',
         description='Whether to enable keepout zones or not'
     )
 
     declare_use_speed_zones_cmd = DeclareLaunchArgument(
-        'use_speed_zones', default_value='True',
+        'use_speed_zones', default_value='False',
         description='Whether to enable speed zones or not'
     )
 
@@ -179,6 +180,7 @@ def generate_launch_description() -> LaunchDescription:
                 PythonLaunchDescriptionSource(
                     os.path.join(launch_dir, 'slam_launch.py')
                 ),
+                # Changed: Use PythonExpression for complex conditions
                 condition=IfCondition(PythonExpression([slam, ' and ', use_localization])),
                 launch_arguments={
                     'namespace': namespace,
@@ -192,6 +194,7 @@ def generate_launch_description() -> LaunchDescription:
                 PythonLaunchDescriptionSource(
                     os.path.join(launch_dir, 'localization_launch.py')
                 ),
+                # Changed: Use PythonExpression for complex conditions
                 condition=IfCondition(PythonExpression(['not ', slam, ' and ', use_localization])),
                 launch_arguments={
                     'namespace': namespace,

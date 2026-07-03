@@ -9,7 +9,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 #Install ROS Packages
 RUN apt update && apt install -y ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
     ros-$ROS_DISTRO-navigation2 \
-    ros-$ROS_DISTRO-nav2-bringup
+    ros-$ROS_DISTRO-nav2-bringup \
+    ros-$ROS_DISTRO-nav2-common
 
 
 #Configure catkin workspace

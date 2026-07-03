@@ -29,6 +29,8 @@ RUN git -C lidar_localization_ros2 checkout 0fe85a563b6d83641d09550d14cc4981ad0f
 RUN git clone -b humble https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git -C ndt_omp_ros2 checkout ef8a34985876359ecac7b7ad0004b6f409f6fbbc
 
+RUN sed -i 's/kRegistrationSourceCloudKeepAliveCount = 4096;/kRegistrationSourceCloudKeepAliveCount = 4;/; s/kRegistrationTargetCloudKeepAliveCount = 4096;/kRegistrationTargetCloudKeepAliveCount = 4;/' $CATKIN_WS/src/lidar_localization_ros2/src/lidar_localization_component.cpp
+
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
 

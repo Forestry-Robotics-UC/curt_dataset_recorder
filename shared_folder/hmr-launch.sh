@@ -20,8 +20,14 @@ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 # Source ROS2 Workspace
 source /root/ros2_ws/install/setup.bash
 
+ros2 run tf2_ros static_transform_publisher --x 0 --y 0 --z 0 --yaw 0 --pitch 0 --roll 0 --frame-id odom_curt --child-frame-id base_link_curt &
+
 ros2 launch lidar_localization_ros2 lidar_localization.launch.py \
-  localization_param_dir:=/root/ros2_ws/src/hmr_localisation/config/gt_ouster_ndt.yaml \
-  cloud_topic:=/ouster/points imu_topic:=/imu/data use_sim_time:=true \
-  global_frame_id:=odom base_frame_id:=base_link lidar_frame_id:=os_lidar \
-  publish_lidar_tf:=false use_imu_preintegration:=false
+  localization_param_dir:=/root/ros2_ws/src/hmr_localisation/config/gt_ouster_ndt_tree.yaml \
+  cloud_topic:=/ouster/points imu_topic:=/curt/imu/data use_sim_time:=true \
+  global_frame_id:=map odom_frame_id:=odom_curt base_frame_id:=base_link_curt \
+  use_imu_preintegration:=true imu_preintegration_use_base_frame_transform:=true \
+  publish_lidar_tf:=false lidar_frame_id:=os_lidar \
+  lidar_tf_x:=0.1105 lidar_tf_y:=0.0 lidar_tf_z:=0.404 lidar_tf_yaw:=3.14159265 \
+  publish_imu_tf:=false imu_frame_id:=imu_curt \
+  imu_tf_x:=0.062 imu_tf_y:=0.0 imu_tf_z:=0.015 imu_tf_yaw:=1.570796

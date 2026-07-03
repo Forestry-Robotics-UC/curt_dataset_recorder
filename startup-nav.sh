@@ -57,11 +57,14 @@ cleanup() {
 # Set trap
 trap cleanup EXIT
 
+#Restart Robot ROS2
+sudo systemctl restart ipa-ros-autostart.service
+
 # Bring up the network connection (if needed)
 #sudo nmcli connection up Ouster
 
 # Kill the ROS2 openzen IMU node from host (if needed)
-#sudo pkill -f "openzen_node" || true
+sudo pkill -f "openzen_node" || true
 
 # --- CONFIGURATION ---
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -69,7 +72,7 @@ cd $SCRIPT_DIR/Docker
 
 # Start container
 echo "Starting container..."
-docker compose up --scale evk4=0 --scale foxglove=0 --scale recorder=0 &
+docker compose up --scale evk4=0 --scale foxglove=0 --scale recorder=0 --scale glim=0 --scale traversability_ros2=0 &
 
 # Wait for container to be ready
 #sleep 4

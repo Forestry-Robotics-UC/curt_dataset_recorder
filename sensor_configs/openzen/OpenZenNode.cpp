@@ -199,8 +199,8 @@ public:
         // By default, this ROS driver converts to the ROS convention. Set this flag to true to
         // use the LPMS convention
         m_useLpmsAccelerationConvention = this->declare_parameter<bool>("use_lpms_acceleration_convention", true);
-        frame_id = this->declare_parameter<std::string>("frame_id", "imu");
-        frame_id_gnss = this->declare_parameter<std::string>("frame_id_gnss", "gnss");
+        frame_id = this->declare_parameter<std::string>("frame_id", "imu_curt");
+        frame_id_gnss = this->declare_parameter<std::string>("frame_id_gnss", "gnss_curt");
 
         m_autocalibration_serv = this->create_service<std_srvs::srv::SetBool>
             ("enable_gyro_autocalibration",

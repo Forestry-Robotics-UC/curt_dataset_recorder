@@ -812,7 +812,7 @@ public:
     void getRobotState(){
         try {
             // Use rclcpp::Time(0) to get the latest available transform
-            transform = tf_buffer->lookupTransform("map", "base_link", rclcpp::Time(0), rclcpp::Duration::from_seconds(0.1));
+            transform = tf_buffer->lookupTransform("map", "base_link_curt", rclcpp::Time(0), rclcpp::Duration::from_seconds(0.1));
             robotState->x[0] = transform.transform.translation.x;
             robotState->x[1] = transform.transform.translation.y;
             robotState->x[2] = transform.transform.translation.z;

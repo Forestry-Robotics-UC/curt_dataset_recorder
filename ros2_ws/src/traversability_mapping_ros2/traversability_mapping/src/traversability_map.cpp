@@ -592,8 +592,8 @@ public:
         try {
             // Use the point cloud's timestamp for TF lookup
             rclcpp::Time cloud_time = rclcpp::Time(stamp);
-            // RCLCPP_DEBUG(this->get_logger(), "Looking up TF: map -> base_link at time %.6f", cloud_time.seconds());
-            transform = tf_buffer->lookupTransform("map", "base_link", cloud_time, rclcpp::Duration::from_seconds(0.1));
+            // RCLCPP_DEBUG(this->get_logger(), "Looking up TF: map -> base_link_curt at time %.6f", cloud_time.seconds());
+            transform = tf_buffer->lookupTransform("map", "base_link_curt", cloud_time, rclcpp::Duration::from_seconds(0.1));
         }
         catch (tf2::TransformException ex) {
             // RCLCPP_ERROR(this->get_logger(), "Transform Failure at time %.6f: %s",

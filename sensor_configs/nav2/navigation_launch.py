@@ -20,7 +20,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch_ros.actions import LoadComposableNodes, SetParameter
+from launch_ros.actions import LoadComposableNodes, SetParameter, PushRosNamespace
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode, ParameterFile
 from nav2_common.launch import RewrittenYaml
@@ -58,7 +58,7 @@ def generate_launch_description():
     # https://github.com/ros/robot_state_publisher/pull/30
     # TODO(orduno) Substitute with `PushNodeRemapping`
     #              https://github.com/ros2/launch_ros/issues/56
-    remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
+    remappings = [('curt/tf', 'tf'), ('curt/tf_static', 'tf_static')]
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {'autostart': autostart}
@@ -78,7 +78,7 @@ def generate_launch_description():
     )
 
     declare_namespace_cmd = DeclareLaunchArgument(
-        'namespace', default_value='', description='Top-level namespace'
+        'namespace', default_value='curt', description='Top-level namespace'
     )
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
@@ -124,6 +124,7 @@ def generate_launch_description():
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
+            PushRosNamespace(namespace),
             SetParameter('use_sim_time', use_sim_time),
             Node(
                 package='nav2_controller',
@@ -246,97 +247,6 @@ def generate_launch_description():
         ],
     )
 
-    load_composable_nodes = GroupAction(
-        condition=IfCondition(use_composition),
-        actions=[
-            SetParameter('use_sim_time', use_sim_time),
-            LoadComposableNodes(
-                target_container=container_name_full,
-                composable_node_descriptions=[
-                    ComposableNode(
-                        package='nav2_controller',
-                        plugin='nav2_controller::ControllerServer',
-                        name='controller_server',
-                        parameters=[configured_params],
-                        remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
-                    ),
-                    ComposableNode(
-                        package='nav2_smoother',
-                        plugin='nav2_smoother::SmootherServer',
-                        name='smoother_server',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='nav2_planner',
-                        plugin='nav2_planner::PlannerServer',
-                        name='planner_server',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='nav2_route',
-                        plugin='nav2_route::RouteServer',
-                        name='route_server',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='nav2_behaviors',
-                        plugin='behavior_server::BehaviorServer',
-                        name='behavior_server',
-                        parameters=[configured_params],
-                        remappings=remappings + [('cmd_vel', 'cmd_vel_nav')],
-                    ),
-                    ComposableNode(
-                        package='nav2_bt_navigator',
-                        plugin='nav2_bt_navigator::BtNavigator',
-                        name='bt_navigator',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='nav2_waypoint_follower',
-                        plugin='nav2_waypoint_follower::WaypointFollower',
-                        name='waypoint_follower',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='nav2_velocity_smoother',
-                        plugin='nav2_velocity_smoother::VelocitySmoother',
-                        name='velocity_smoother',
-                        parameters=[configured_params],
-                        remappings=remappings
-                        + [('cmd_vel', 'cmd_vel_nav')],
-                    ),
-                    ComposableNode(
-                        package='nav2_collision_monitor',
-                        plugin='nav2_collision_monitor::CollisionMonitor',
-                        name='collision_monitor',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='opennav_docking',
-                        plugin='opennav_docking::DockingServer',
-                        name='docking_server',
-                        parameters=[configured_params],
-                        remappings=remappings,
-                    ),
-                    ComposableNode(
-                        package='nav2_lifecycle_manager',
-                        plugin='nav2_lifecycle_manager::LifecycleManager',
-                        name='lifecycle_manager_navigation',
-                        parameters=[
-                            {'autostart': autostart, 'node_names': lifecycle_nodes}
-                        ],
-                    ),
-                ],
-            ),
-        ],
-    )
-
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -354,6 +264,5 @@ def generate_launch_description():
     ld.add_action(declare_log_level_cmd)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
-    ld.add_action(load_composable_nodes)
 
     return ld

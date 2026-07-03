@@ -9,6 +9,8 @@ set -e
 
 #Cyclonedds
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+#export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+
 
 # Source ROS2 Jazzy
 source /opt/ros/jazzy/setup.bash

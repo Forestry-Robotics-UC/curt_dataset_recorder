@@ -4,7 +4,7 @@
   <!-- Some properties -->
   <xacro:include filename="properties.xacro" />
 
-  <gazebo reference="base_link">
+  <gazebo reference="base_link_curt">
     <material>Gazebo/Grey</material>
   </gazebo>
 

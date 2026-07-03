@@ -16,27 +16,27 @@
 
   <!-- LPResearch CANAL3 IMU -->
   <joint name="base_link_to_imu" type="fixed">
-    <parent link="base_link" />
-    <child link="imu_link" />
+    <parent link="base_link_curt" />
+    <child link="imu_curt" />
     <origin xyz="0.062 0.0 0.015" rpy="0.0 0.0 -${pi/2}" />
   </joint>
-  <link name="imu_link" />
+  <link name="imu_curt" />
 
   <!-- RM3100 MAG -->
   <joint name="base_link_to_mag" type="fixed">
-    <parent link="base_link" />
-    <child link="mag" />
+    <parent link="base_link_curt" />
+    <child link="mag_curt" />
     <origin xyz="-0.2 0.0 0.204" rpy="0.0 0.0 ${pi/2}" />
   </joint>
-  <link name="mag" />
+  <link name="mag_curt" />
 
   <!-- Emlid Antenna -->
   <joint name="base_link_to_gps" type="fixed">
-    <parent link="base_link" />
-    <child link="gps" />
+    <parent link="base_link_curt" />
+    <child link="gps_curt" />
     <origin xyz="-0.25 0.11 0.204" rpy="0.0 0.0 0.0" />
   </joint>
-  <link name="gps" />
+  <link name="gps_curt" />
 
   <!-- OUSTER TOWER VISUAL LINK -->
   <!-- This link contains only the visual mesh for the ouster lidar -->
@@ -57,7 +57,7 @@
   <!-- OUSTER TOWER VISUAL JOINT -->
   <!-- This joint positions the visual mesh -->
   <joint name="base_link_to_ouster_tower_visual" type="fixed">
-    <parent link="base_link" />
+    <parent link="base_link_curt" />
     <child link="ouster_tower_visual" />
     <origin xyz="0.1105 0 0.204"
       rpy="0 0 ${PI}" />
@@ -82,7 +82,7 @@
   <!-- CAMERA TOWER VISUAL JOINT -->
   <!-- This joint positions the visual mesh -->
   <joint name="base_link_to_cameras_tower_visual" type="fixed">
-    <parent link="base_link" />
+    <parent link="base_link_curt" />
     <child link="cameras_tower_visual" />
     <origin xyz="0.2407 0 0.204"
       rpy="0 0 0" />
@@ -104,7 +104,7 @@
 
   <!-- OS_SENSOR JOINT -->
   <joint name="base_link_to_os_sensor" type="fixed">
-    <parent link="base_link" />
+    <parent link="base_link_curt" />
     <child link="os_sensor" />
     <origin xyz="0.1105 0.0 0.404" rpy="0.0 0.0 ${pi}" />
   </joint>
@@ -183,7 +183,7 @@
   <!-- ========================================== -->
 
   <!-- CAMERA_LINK (RealSense Physical Mount) -->
-  <link name="camera_link">
+  <link name="camera_curt_link">
     <collision>
       <origin rpy="0 0 0" xyz="0.0 0 0.0" />
       <geometry>
@@ -199,14 +199,14 @@
 
   <!-- CAMERA_LINK JOINT -->
   <joint name="base_link_to_camera_link" type="fixed">
-    <parent link="base_link" />
-    <child link="camera_link" />
+    <parent link="base_link_curt" />
+    <child link="camera_curt_link" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
   </joint>
 
   <!-- CAMERA_COLOR_OPTICAL_FRAME LINK -->
   <!-- This is the actual optical frame for the RealSense color camera -->
-  <link name="camera_color_optical_frame">
+  <link name="camera_curt_color_optical_frame">
     <inertial>
       <mass value="1e-5" />
       <origin rpy="0 0 0" xyz="0.0 0 0.0" />
@@ -225,7 +225,7 @@
   
   <joint name="joint_os_lidar_to_camera_color_optical_frame" type="fixed">
     <parent link="os_lidar" />
-    <child link="camera_color_optical_frame" />
+    <child link="camera_curt_color_optical_frame" />
     <origin xyz="-0.16017594021604675 -0.04929723933704603 -0.12489075373962405" rpy="-1.5727906392966173 -0.027026586713933824 1.5723834999258628" />
   </joint>
 
