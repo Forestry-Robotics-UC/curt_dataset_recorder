@@ -410,9 +410,7 @@ services:
       - ../../rosbags/:/root/rosbags/
       - ../ros2_ws/build/glim-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
-      - ../ros2_ws/src/glim:/root/ros2_ws/src/glim
-      - ../ros2_ws/src/glim_ros2:/root/ros2_ws/src/glim_ros2
-      - ../ros2_ws/src/glim_ext:/root/ros2_ws/src/glim_ext
+      - ../sensor_configs/glim/config:/root/ros2_ws/src/glim/config
     environment:
       - ROS_DOMAIN_ID=30
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml

@@ -51,7 +51,9 @@ RUN make install
 # CLone glim repo
 WORKDIR /root
 RUN mkdir -p /root/ros2_ws/src
-
+WORKDIR /root/ros2_ws/src
+RUN git clone https://github.com/koide3/glim.git
+RUN git clone https://github.com/koide3/glim_ros2.git
 # without viewer and CUDA
 # WORKDIR /root/glim/build
 # RUN cmake .. \
