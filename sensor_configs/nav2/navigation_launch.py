@@ -19,7 +19,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import LaunchConfiguration, PythonExpression, NotEqualsSubstitution
 from launch_ros.actions import LoadComposableNodes, SetParameter, PushRosNamespace
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode, ParameterFile
@@ -39,6 +39,7 @@ def generate_launch_description():
     container_name_full = (namespace, '/', container_name)
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
+    map_yaml_file = LaunchConfiguration('map')
 
     lifecycle_nodes = [
         'controller_server',
@@ -50,6 +51,7 @@ def generate_launch_description():
         #'collision_monitor',
         'bt_navigator',
         #'waypoint_follower',
+        'map_server'
     ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
@@ -111,6 +113,10 @@ def generate_launch_description():
         description='the name of conatiner that nodes will load in if use composition',
     )
 
+    declare_map_yaml_cmd = DeclareLaunchArgument(
+        'map', default_value='/root/shared_folder/kalhan_occupation_map.yaml', description='Full path to map yaml file to load'
+    )
+
     declare_use_respawn_cmd = DeclareLaunchArgument(
         'use_respawn',
         default_value='False',
@@ -126,6 +132,20 @@ def generate_launch_description():
         actions=[
             PushRosNamespace(namespace),
             SetParameter('use_sim_time', use_sim_time),
+            Node(
+                condition=IfCondition(
+                    NotEqualsSubstitution(LaunchConfiguration('map'), '')
+                ),
+                package='nav2_map_server',
+                executable='map_server',
+                name='map_server',
+                output='screen',
+                respawn=use_respawn,
+                respawn_delay=2.0,
+                parameters=[configured_params, {'yaml_filename': map_yaml_file}],
+                arguments=['--ros-args', '--log-level', log_level],
+                remappings=remappings,
+            ),
             Node(
                 package='nav2_controller',
                 executable='controller_server',
@@ -150,7 +170,7 @@ def generate_launch_description():
             Node(
                 package='nav2_planner',
                 executable='planner_server',
-                name='planner_server',
+                name='planner_server',  
                 output='screen',
                 respawn=use_respawn,
                 respawn_delay=2.0,
@@ -262,6 +282,7 @@ def generate_launch_description():
     ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+    ld.add_action(declare_map_yaml_cmd)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
 

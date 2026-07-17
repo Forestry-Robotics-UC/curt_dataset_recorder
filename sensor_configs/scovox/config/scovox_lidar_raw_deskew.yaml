@@ -40,9 +40,9 @@
     # auto: deskew because /ouster/points carries a per-point `t` field. Falls
     # back to the single-pose path (with a throttled warn) until the first IMU
     # msg + the static os_lidar<-imu extrinsic are available.
-    deskew_mode: "auto"          # auto | on | off
+    deskew_mode: "on"          # auto | on | off
     imu_topic: "/curt/imu/data"
-    imu_frame: ""                # "" -> taken from the first /imu msg header
+    imu_frame: "imu_curt"                # "" -> taken from the first /imu msg header
     deskew_window_sec: 0.2       # per-scan integration window (>= one Ouster scan)
     imu_retention_sec: 1.0       # rolling gyro buffer depth
     deskew_min_angle_deg: 0.0    # >0: skip the per-point rotate when a scan turns less than this
@@ -74,7 +74,7 @@
     # computed its pose, so a short TF timeout falls back to Time(0) (the previous
     # scan's pose) and MIS-PLACES the whole scan -> accumulation smear. Wait for
     # the exact-stamp pose instead (GLIM's TF arrives once it finishes the scan).
-    tf_lookup_timeout_sec: 1.0   # wait this long for the exact-stamp odom<-os_lidar pose
+    tf_lookup_timeout_sec: 2.0   # wait this long for the exact-stamp odom<-os_lidar pose
     tf_require_exact: true       # drop a scan rather than integrate it at a stale Time(0) pose
 
     # --- Voxel grid ------------------------------------------------------
@@ -102,8 +102,8 @@
     grazing_angle_threshold: -1.0
 
     # --- Frames (driven by GLIM SLAM) ------------------------------------
-    base_frame:        "os_lidar"   # ray origin = LiDAR optical centre (raw cloud is in os_lidar)
-    integration_frame: "odom_curt"       # GLIM smooth/jump-free odometry frame
+    base_frame:        "base_link_curt"   # ray origin = LiDAR optical centre (raw cloud is in os_lidar)
+    integration_frame: "map_curt"       # GLIM smooth/jump-free odometry frame
     map_frame:         "map_curt"
 
     # --- TF startup gate -------------------------------------------------
@@ -121,7 +121,7 @@
     reject_gate_min_consecutive:      0
 
     # --- Mode ------------------------------------------------------------
-    mode: "persistent"
+    mode: "rolling"
     dataset_mode: false
 
     # --- Outputs ---------------------------------------------------------

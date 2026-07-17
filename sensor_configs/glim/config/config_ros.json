@@ -58,7 +58,7 @@
     "lidar_frame_id": "os_lidar", // Auto-detect if blank
     "base_frame_id": "base_link_curt", // If blank, IMU frame ID is used
     "odom_frame_id": "odom_curt",
-    "map_frame_id": "map",
+    "map_frame_id": "map_curt",
     "publish_imu2lidar": false,
     "tf_time_offset": 1e-6,
     // Extension modules

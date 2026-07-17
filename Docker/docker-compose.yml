@@ -465,6 +465,8 @@ services:
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/scovox/config:/root/ros2_ws/src/scovox/config
       - ../sensor_configs/explo_planner/config:/root/ros2_ws/src/explo_planner/config
+      - ../sensor_configs/scovox/scovox_multi_robot.launch.py:/root/ros2_ws/src/scovox/src/scovox_mapping/launch/scovox_multi_robot.launch.py:rw
+      - ../sensor_configs/scovox/dscovox_single_robot.launch.py:/root/ros2_ws/src/scovox/src/scovox_mapping/launch/dscovox_single_robot.launch.py:rw
     environment:
       - ROS_DOMAIN_ID=30
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml

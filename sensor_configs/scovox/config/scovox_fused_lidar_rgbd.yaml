@@ -30,10 +30,10 @@
 
 /**:
   ros__parameters:
-    use_sim_time: true
+    use_sim_time: false
 
     # --- Master switch: per-source HitWeights profiles ---------------------
-    fuse_lidar_rgbd: true
+    fuse_lidar_rgbd: false
 
     # --- Inputs ------------------------------------------------------------
     # RGB-D path: seg_node's re-stamped depth+info + colored labels.
@@ -42,13 +42,13 @@
     seg_topic:        "/scovox/segmentation/colored"
     # LiDAR path: RAW Ouster cloud (frame os_lidar), deskewed in-node (below).
     input_pointcloud_topic: "/ouster/points"
-    imu_topic:              "/imu/data"        # gyro source for deskew
+    imu_topic:              "/curt/imu/data"        # gyro source for deskew
     dataset_mode: false
 
     # --- Frames --------------------------------------------------------------
-    integration_frame: "map"                   # same global frame as the NDT/gt map
-    map_frame:         "map"
-    base_frame:        "base_link"
+    integration_frame: "map_curt"                   # same global frame as the NDT/gt map
+    map_frame:         "map_curt"
+    base_frame:        "base_link_curt"
     lidar_base_frame:  "os_lidar"              # LiDAR ray origin
     rgbd_base_frame:   "camera_color_frame"    # RGB-D ray origin (body frame;
                                                # SCovox applies its own optical->body kR)
