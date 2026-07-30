@@ -27,9 +27,10 @@ services:
       - ../sensor_configs/openzen/OpenZenNode.cpp:/root/ros2_ws/src/openzenros2/src/OpenZenNode.cpp
       - ../sensor_configs/openzen/openzen_lpms.launch.py:/root/ros2_ws/src/openzenros2/launch/openzen_lpms.launch.py
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/openzen-launch.sh
+    cpuset: "10-13"
 
   rm3100:
     build:
@@ -47,9 +48,10 @@ services:
       - ../sensor_configs/rm3100/rm3100_driver.py:/root/ros2_ws/src/go1_magnetometer_rm3100/src/rm3100_driver.py:rw
       - ../ros2_ws/src/imu_mag_fusion:/root/ros2_ws/src/imu_mag_fusion
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/rm3100-launch.sh
+    cpuset: "14-15"
 
   emlid:
     build:
@@ -66,9 +68,10 @@ services:
       - ../sensor_configs/emlid/driver.py:/root/ros2_ws/src/nmea_navsat_driver/src/libnmea_navsat_driver/driver.py:rw
       - ../sensor_configs/emlid/nmea_serial_driver.yaml:/root/ros2_ws/src/nmea_navsat_driver/config/nmea_serial_driver.yaml:rw
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/emlid-launch.sh
+    cpuset: "14-15"
 
   realsense:
     image: docker-realsense:latest
@@ -83,14 +86,14 @@ services:
       REALSENSE_COLOR_CAMERA_INFO_URL: ""
       REALSENSE_ALIGNED_DEPTH_TO_COLOR_CAMERA_INFO_URL: ""
       REALSENSE_COMPRESS_MODE: "none"
-      REALSENSE_COMPRESS_TOPICS: "/curt/camera_curt/color/image_raw"
+      REALSENSE_COMPRESS_TOPICS: "/camera/color/image_raw"
       COMPRESS_PNG_LEVEL: "1"
       COMPRESS_FFMPEG_ENCODER: "libx264rgb"
       COMPRESS_FFMPEG_ENCODER_AV_OPTIONS: "preset:ultrafast,crf:0"
       COMPRESS_FFMPEG_BIT_RATE: "20000000"
       COMPRESS_FFMPEG_GOP_SIZE: "10"
       COMPRESS_FFMPEG_QMAX: "1"
-      ROS_DOMAIN_ID: 30
+      ROS_DOMAIN_ID: 37
       CYCLONEDDS_URI: "file:///root/shared_folder/cyclonedds-config.xml"
     volumes:
       - /dev/:/dev/
@@ -100,6 +103,7 @@ services:
       - ../sensor_configs/realsense/rs_launch.py:/root/ros2_ws/src/realsense-ros/realsense2_camera/launch/rs_launch.py:rw
       - ../ros2_ws/src/realsense_camera_info_override:/root/ros2_ws/src/realsense_camera_info_override:rw
     command: /root/shared_folder/realsense-launch.sh
+    cpuset: "10-13"
   # realsense_png:
   #   image: docker-realsense:latest
   #   build:
@@ -179,9 +183,10 @@ services:
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/ouster/driver_params.yaml:/root/ros2_ws/src/ouster-ros/ouster-ros/config/driver_params.yaml:rw
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/ouster-launch.sh
+    cpuset: "10-13"
 
   # mapir:
   #   image: docker-mapir:latest
@@ -259,7 +264,7 @@ services:
       COMPRESS_FFMPEG_BIT_RATE: "20000000"
       COMPRESS_FFMPEG_GOP_SIZE: "10"
       COMPRESS_FFMPEG_QMAX: "1"
-      ROS_DOMAIN_ID: 30
+      ROS_DOMAIN_ID: 37
       CYCLONEDDS_URI: "file:///root/shared_folder/cyclonedds-config.xml"
     volumes:
       - /dev/:/dev/
@@ -269,6 +274,7 @@ services:
       - ../sensor_configs/mapir/mapir_camera_params.yaml:/root/ros2_ws/src/mapir-camera-ros2/config/mapir_camera_params.yaml:rw
       - ../sensor_configs/mapir/mapir_camera.launch.py:/root/ros2_ws/src/mapir-camera-ros2/launch/mapir_camera.launch.py:rw
     command: /root/shared_folder/mapir-launch.sh
+    cpuset: "10-13"
 
   curt:
     image: docker-curt:latest
@@ -283,9 +289,10 @@ services:
       - ../ros2_ws/src/curt_description:/root/ros2_ws/src/curt_description
       - ../shared_folder/:/root/shared_folder/
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/curt-launch.sh
+    cpuset: "14-15"
 
   recorder:
     image: docker-recorder:latest
@@ -301,9 +308,10 @@ services:
       - ../ros2_ws/build/recorder-build:/root/ros2_ws/build
       - ../shared_folder/:/root/shared_folder/
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/recorder-launch.sh
+    cpuset: "14-15"
 
   ## Extra Sensors
 
@@ -318,9 +326,10 @@ services:
     volumes:
       - ../shared_folder/:/root/shared_folder/
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command:  /root/shared_folder/evk4-launch.sh
+    cpuset: "10-13"
 
   # ikalibr:
   #   image: ulong2/ie_kalibr_image:latest
@@ -375,10 +384,11 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
       - DISPLAY=$DISPLAY
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/foxglove-launch.sh
-    
+    cpuset: "9"
+
 ### NAVIGATION PIPELINE ###
 
   traversability_ros2:
@@ -394,9 +404,10 @@ services:
       - ../shared_folder/:/root/shared_folder/
       - ../ros2_ws/src/traversability_mapping_ros2:/root/ros2_ws/src/traversability_mapping_ros2
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/trav_ros2-launch.sh
+    cpuset: "8"
 
   glim:
     build:
@@ -412,9 +423,10 @@ services:
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/glim/config:/root/ros2_ws/src/glim/config
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/glim-launch.sh
+    cpuset: "0-5"
 
   nav2:
     build:
@@ -429,9 +441,10 @@ services:
       - ../sensor_configs/nav2/navigation_launch.py:/opt/ros/kilted/share/nav2_bringup/launch/navigation_launch.py:rw
       - ../sensor_configs/nav2/bringup_launch.py:/opt/ros/kilted/share/nav2_bringup/launch/bringup_launch.py:rw
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/nav2-launch.sh
+    cpuset: "6"
 
 ### Kalhan Algorithms
 
@@ -448,9 +461,10 @@ services:
       - ../shared_folder/:/root/shared_folder/
       - ../sensor_configs/hmr_localisation/gt_ouster_ndt_tree.yaml:/root/ros2_ws/src/hmr_localisation/config/gt_ouster_ndt_tree.yaml:rw
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/hmr-launch.sh
+    cpuset: "7"
 
   scovox:
     build:
@@ -467,7 +481,27 @@ services:
       - ../sensor_configs/explo_planner/config:/root/ros2_ws/src/explo_planner/config
       - ../sensor_configs/scovox/scovox_multi_robot.launch.py:/root/ros2_ws/src/scovox/src/scovox_mapping/launch/scovox_multi_robot.launch.py:rw
       - ../sensor_configs/scovox/dscovox_single_robot.launch.py:/root/ros2_ws/src/scovox/src/scovox_mapping/launch/dscovox_single_robot.launch.py:rw
+      - ../sensor_configs/scovox/dscovox_multi_robot.launch.py:/root/ros2_ws/src/scovox/src/scovox_mapping/launch/dscovox_multi_robot.launch.py:rw
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=37
       - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
     command: /root/shared_folder/scovox-launch.sh
+    cpuset: "0-5"
+
+  domain_bridge:
+    build:
+     context: .
+     dockerfile: domain_bridge/domain.Dockerfile
+    container_name: domain_bridge
+    privileged: true
+    network_mode: host
+    volumes:
+      - /dev/:/dev/
+      - ../ros2_ws/build/domain-build:/root/ros2_ws/build
+      - ../shared_folder/:/root/shared_folder/
+      - ../sensor_configs/domain_bridge/bridge_config.yaml:/root/ros2_ws/src/domain_bridge/examples/bridge_config.yaml
+    environment:
+      - ROS_DOMAIN_ID=37
+      - CYCLONEDDS_URI=file:///root/shared_folder/cyclonedds-config.xml
+    command: /root/shared_folder/domain-launch.sh
+    cpuset: "14-15"

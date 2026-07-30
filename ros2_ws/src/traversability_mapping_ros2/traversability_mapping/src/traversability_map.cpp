@@ -89,7 +89,7 @@ public:
 
         // subOdom = nh.subscribe<nav_msgs::Odometry>("/gps_waypoint_nav/odometry/navsat", 5, &TraversabilityMapping::odomHandler, this);
         subOdom = this->create_subscription<nav_msgs::msg::Odometry>(
-            "/gps_waypoint_nav/odometry/navsat", 5,
+            "/curt/glim_ros/odom_corrected", 5,
             std::bind(&TraversabilityMapping::odomHandler, this, std::placeholders::_1));
 
         allocateMemory();
@@ -142,11 +142,11 @@ public:
         //            laserCloudMsg->width * laserCloudMsg->height,
         //            rclcpp::Time(laserCloudMsg->header.stamp).seconds());
         // Get Robot Position
-        if (getRobotPosition(currentCloudStamp) == false)
-        {
-            RCLCPP_WARN(this->get_logger(), "Failed to get robot position, skipping processing");
-            return;
-        }
+        //if (getRobotPosition(currentCloudStamp) == false)
+        //{
+        //    RCLCPP_WARN(this->get_logger(), "Failed to get robot position, skipping processing");
+        //    return;
+        //}
         // Convert Point Cloud
         pcl::fromROSMsg(*laserCloudMsg, *laserCloud);
         // Register New Scan
@@ -300,15 +300,12 @@ public:
     }
 
     void decayOldElevation() {
-
         rclcpp::Time current_time = rclcpp::Time(currentCloudStamp);
-        float decayRadius = 2.0;
-        rclcpp::Duration max_age(0, 500000000); // 0.5 seconds in nanoseconds
-        float decay_factor = 0.5;   // Reduce elevation confidence by 10% per cycle
-        float max_reset_variance = 1.0; //Max uncertain to reset the cell
+        float decayRadius = 5.0;
+        float decay_factor = 0.5;   
+        float max_reset_variance = 1.0;
 
         for (auto childMap : mapArray) {
-            // Calculate submap origin
             float submap_origin_x = childMap->originX + mapCubeLength / 2.0;
             float submap_origin_y = childMap->originY + mapCubeLength / 2.0;
             float dx = robotPoint.x - submap_origin_x;
@@ -316,28 +313,27 @@ public:
             if (sqrt(dx*dx + dy*dy) > decayRadius) {
                 continue;
             }
+            
             for (int i = 0; i < mapCubeArrayLength; ++i) {
                 for (int j = 0; j < mapCubeArrayLength; ++j) {
-
                     mapCell_t* thisCell = childMap->cellArray[i][j];
-
+                    
                     if (thisCell->elevation == -FLT_MAX) continue;
-
-                    if (!thisCell->updated_in_current_scan &&
-                         (current_time - thisCell->last_updated_time).seconds() > max_age.seconds()) {
-                        // if ((current_time - thisCell->last_updated_time) > max_age) {
-                        if (!thisCell->updated_in_current_scan) {
-                            // Gradually reduce elevation confidence
-                            thisCell->elevationVar *= (1.0 / decay_factor); // Increase uncertainty
-                            if (thisCell->elevationVar > max_reset_variance) { // If too uncertain, reset
-                                thisCell->elevation = -FLT_MAX;
-                                thisCell->elevationVar = 0.0;
-                                thisCell->log_odds = 0.0;
-                                thisCell->occupancy = 0;
-                            }
+                    
+                    if (!thisCell->updated_in_current_scan) {
+                        // Cell was not observed in this scan, apply decay
+                        thisCell->elevationVar *= (1.0 / decay_factor);
+                        
+                        if (thisCell->elevationVar > max_reset_variance) {
+                            thisCell->elevation = -FLT_MAX;
+                            thisCell->elevationVar = 0.0;
+                            thisCell->log_odds = 0.0;
+                            thisCell->occupancy = 0;
+                            thisCell->observeTimes = 0;  // Reset observation counter too
                         }
-                        thisCell->updated_in_current_scan = false; // Reset for next scan
                     }
+                    // Always reset the flag for next scan
+                    thisCell->updated_in_current_scan = false;
                 }
             }
         }
@@ -520,9 +516,9 @@ public:
 
         // 2 Calculate local occupancy grid map root position
         occupancyMap2DHeight.header.stamp = currentCloudStamp;
-        occupancyMap2DHeight.header.frame_id = "map";
+        occupancyMap2DHeight.header.frame_id = "map_curt";
         occupancyMap2DHeight.occupancy.header.stamp = currentCloudStamp;
-        occupancyMap2DHeight.occupancy.header.frame_id = "map";
+        occupancyMap2DHeight.occupancy.header.frame_id = "map_curt";
         occupancyMap2DHeight.occupancy.info.origin.position.x = localMapOriginPoint.x;
         occupancyMap2DHeight.occupancy.info.origin.position.y = localMapOriginPoint.y;
         occupancyMap2DHeight.occupancy.info.origin.position.z = localMapOriginPoint.z; // add 10, just for visualization
@@ -565,7 +561,7 @@ public:
     void initializeLocalOccupancyMap()
     {
         // initialization of customized map message
-        occupancyMap2DHeight.header.frame_id = "map"; //odom
+        occupancyMap2DHeight.header.frame_id = "map_curt"; //odom
         occupancyMap2DHeight.occupancy.info.width = localMapArrayLength;
         occupancyMap2DHeight.occupancy.info.height = localMapArrayLength;
         occupancyMap2DHeight.occupancy.info.resolution = mapResolution;
@@ -582,9 +578,9 @@ public:
 
     void odomHandler(const nav_msgs::msg::Odometry::SharedPtr msg) {
 
-        // robotPoint.x = msg->pose.pose.position.x;
-        // robotPoint.y = msg->pose.pose.position.y;
-        // robotPoint.z = msg->pose.pose.position.z;
+        robotPoint.x = msg->pose.pose.position.x;
+        robotPoint.y = msg->pose.pose.position.y;
+        robotPoint.z = msg->pose.pose.position.z;
     }
 
     bool getRobotPosition(builtin_interfaces::msg::Time stamp)
@@ -593,7 +589,7 @@ public:
             // Use the point cloud's timestamp for TF lookup
             rclcpp::Time cloud_time = rclcpp::Time(stamp);
             // RCLCPP_DEBUG(this->get_logger(), "Looking up TF: map -> base_link_curt at time %.6f", cloud_time.seconds());
-            transform = tf_buffer->lookupTransform("map", "base_link_curt", cloud_time, rclcpp::Duration::from_seconds(0.1));
+            transform = tf_buffer->lookupTransform("map_curt", "base_link_curt", cloud_time, rclcpp::Duration::from_seconds(0.1));
         }
         catch (tf2::TransformException ex) {
             // RCLCPP_ERROR(this->get_logger(), "Transform Failure at time %.6f: %s",
@@ -643,7 +639,7 @@ public:
         // 3. Publish elevation point cloud
         sensor_msgs::msg::PointCloud2 laserCloudTemp;
         pcl::toROSMsg(*laserCloudElevation, laserCloudTemp);
-        laserCloudTemp.header.frame_id = "map"; //odom
+        laserCloudTemp.header.frame_id = "map_curt"; //odom
         laserCloudTemp.header.stamp = currentCloudStamp;
         pubElevationCloud->publish(laserCloudTemp);
         // 4. free memory

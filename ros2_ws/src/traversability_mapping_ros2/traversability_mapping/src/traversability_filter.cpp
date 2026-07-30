@@ -99,7 +99,7 @@ public:
         // RCLCPP_INFO(this->get_logger(), "  /full_cloud_info");
 
         subOdom = this->create_subscription<nav_msgs::msg::Odometry>(
-            "/gps_waypoint_nav/odometry/navsat", 5,
+            "/curt/glim_ros/odom_corrected", 5,
             std::bind(&TraversabilityFilter::odomHandler, this, std::placeholders::_1));
 
         nanPoint.x = std::numeric_limits<float>::quiet_NaN();
@@ -330,32 +330,32 @@ public:
     }
 
     void odomHandler(const nav_msgs::msg::Odometry::SharedPtr msg) {
-        // robotPoint.x = msg->pose.pose.position.x;
-        // robotPoint.y = msg->pose.pose.position.y;
-        // robotPoint.z = msg->pose.pose.position.z;
+        robotPoint.x = msg->pose.pose.position.x;
+        robotPoint.y = msg->pose.pose.position.y;
+        robotPoint.z = msg->pose.pose.position.z;
     }
 
     bool transformCloud()
     {
         // Always use the point cloud's timestamp for TF lookup
-        rclcpp::Time cloud_time = rclcpp::Time(cloudHeader.stamp);
+        // rclcpp::Time cloud_time = rclcpp::Time(cloudHeader.stamp);
 
-        try{transform = tf_buffer->lookupTransform("map","base_link_curt", cloud_time, rclcpp::Duration::from_seconds(0.1)); }
-        catch (tf2::TransformException ex){
-            RCLCPP_ERROR(this->get_logger(), "TF lookup failed: map -> base_link_curt at time %.6f: %s",
-                        cloud_time.seconds(), ex.what());
-            return false;
-        }
+        // try{transform = tf_buffer->lookupTransform("map_curt","base_link_curt", cloud_time, rclcpp::Duration::from_seconds(0.1)); }
+        // catch (tf2::TransformException ex){
+        //     RCLCPP_ERROR(this->get_logger(), "TF lookup failed: map -> base_link_curt at time %.6f: %s",
+        //                 cloud_time.seconds(), ex.what());
+        //     return false;
+        // }
 
-        robotPoint.x = transform.transform.translation.x;
-        robotPoint.y = transform.transform.translation.y;
-        robotPoint.z = transform.transform.translation.z;
+        // robotPoint.x = transform.transform.translation.x;
+        // robotPoint.y = transform.transform.translation.y;
+        // robotPoint.z = transform.transform.translation.z;
 
         laserCloudIn->header.frame_id = "base_link_curt";
         laserCloudIn->header.stamp = 0;
 
         pcl::PointCloud<PointType> laserCloudTemp;
-        pcl_ros::transformPointCloud("map", *laserCloudIn, laserCloudTemp, *tf_buffer);
+        pcl_ros::transformPointCloud("map_curt", *laserCloudIn, laserCloudTemp, *tf_buffer);
         *laserCloudIn = laserCloudTemp;
 
         // RCLCPP_DEBUG(this->get_logger(), "After transform, laserCloudIn has %zu points (need %d)",
@@ -493,7 +493,7 @@ public:
             sensor_msgs::msg::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
             laserCloudTemp.header.stamp = cloudHeader.stamp;
-            laserCloudTemp.header.frame_id = "map";
+            laserCloudTemp.header.frame_id = "map_curt";
             pubCloudVisualHiRes->publish(laserCloudTemp);
         }
     }
@@ -549,7 +549,7 @@ public:
             sensor_msgs::msg::PointCloud2 laserCloudTemp;
             pcl::toROSMsg(*laserCloudOut, laserCloudTemp);
             laserCloudTemp.header.stamp = cloudHeader.stamp;
-            laserCloudTemp.header.frame_id = "map";
+            laserCloudTemp.header.frame_id = "map_curt";
             pubCloudVisualLowRes->publish(laserCloudTemp);
         }
     }
@@ -667,14 +667,14 @@ public:
         // Always use the point cloud's timestamp for TF lookup
         rclcpp::Time cloud_time = rclcpp::Time(cloudHeader.stamp);
 
-        try{transform = tf_buffer->lookupTransform("base_link_curt","map", cloud_time, rclcpp::Duration::from_seconds(0.1));}
+        try{transform = tf_buffer->lookupTransform("base_link_curt","map_curt", cloud_time, rclcpp::Duration::from_seconds(0.1));}
         catch (tf2::TransformException ex){
             RCLCPP_ERROR(this->get_logger(), "TF lookup failed: base_link_curt -> map at time %.6f: %s",
                         cloud_time.seconds(), ex.what());
             return;
         }
 
-        laserCloudObstacles->header.frame_id = "map";
+        laserCloudObstacles->header.frame_id = "map_curt";
         laserCloudObstacles->header.stamp = rclcpp::Time(cloudHeader.stamp).nanoseconds();
         pcl::PointCloud<PointType> laserCloudTemp;
         pcl_ros::transformPointCloud("base_link_curt", *laserCloudObstacles, laserCloudTemp, *tf_buffer);

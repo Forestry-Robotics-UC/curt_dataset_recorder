@@ -5,47 +5,47 @@ set -e
 # Cleanup function
 cleanup() {
     local exit_code=$?
-    echo "=== RM3100 CAN0 ==="
+    # echo "=== RM3100 CAN0 ==="
     
     # Get container PID if still exists
-    local pid
-    pid=$(docker inspect -f '{{.State.Pid}}' rm3100 2>/dev/null || echo "")
+    # local pid
+    # pid=$(docker inspect -f '{{.State.Pid}}' rm3100 2>/dev/null || echo "")
     
-    if [ ! -z "$pid" ] && [ "$pid" != "0" ] && [ "$pid" != "<no value>" ]; then
-        echo "Container still running (PID: $pid)"
+    # if [ ! -z "$pid" ] && [ "$pid" != "0" ] && [ "$pid" != "<no value>" ]; then
+    #     echo "Container still running (PID: $pid)"
         
-        # Try to move CAN back
-        sudo nsenter -t $pid -n ip link set can0 down 2>/dev/null || true
-        sudo ip link set can0 netns 1 2>/dev/null && {
-            echo "can0 successfully returned to host"
-            sudo ip link set can0 up
-            #ip -details link show can0
-            return $exit_code
-        }
-    fi
+    #     # Try to move CAN back
+    #     sudo nsenter -t $pid -n ip link set can0 down 2>/dev/null || true
+    #     sudo ip link set can0 netns 1 2>/dev/null && {
+    #         echo "can0 successfully returned to host"
+    #         sudo ip link set can0 up
+    #         #ip -details link show can0
+    #         return $exit_code
+    #     }
+    # fi
     
     # If we get here, we need to recreate CAN
-    echo "Restoring CAN interface on host..."
+    # echo "Restoring CAN interface on host..."
     
-    # Reload gs_usb driver
-    echo "Reloading gs_usb driver..."
-    sudo rmmod gs_usb 2>/dev/null || true
-    sleep 1
-    sudo modprobe gs_usb
-    sleep 2
+    # # Reload gs_usb driver
+    # echo "Reloading gs_usb driver..."
+    # sudo rmmod gs_usb 2>/dev/null || true
+    # sleep 1
+    # sudo modprobe gs_usb
+    # sleep 2
     
     # Configure CAN
-    if ip link show can0 &>/dev/null; then
-        echo "can0 reappeared, configuring..."
-        sudo ip link set can0 type can bitrate 1000000
-        sudo ip link set can0 up
-        echo "=== RM3100 CAN0 Restored ==="
-        #ip -details link show can0
-    else
-        echo "can0 did not reappear automatically"
-        echo "Try physically reconnecting the USB-CAN adapter"
-        echo "Then run: sudo ip link set can0 type can bitrate 500000 && sudo ip link set can0 up"
-    fi
+    # if ip link show can0 &>/dev/null; then
+    #     echo "can0 reappeared, configuring..."
+    #     sudo ip link set can0 type can bitrate 1000000
+    #     sudo ip link set can0 up
+    #     echo "=== RM3100 CAN0 Restored ==="
+    #     #ip -details link show can0
+    # else
+    #     echo "can0 did not reappear automatically"
+    #     echo "Try physically reconnecting the USB-CAN adapter"
+    #     echo "Then run: sudo ip link set can0 type can bitrate 500000 && sudo ip link set can0 up"
+    # fi
     
     # Eliminate containers
     docker compose down
@@ -56,6 +56,9 @@ cleanup() {
 
 # Set trap
 trap cleanup EXIT
+
+#Restart Robot ROS2
+sudo systemctl restart ipa-ros-autostart.service
 
 # Bring up the network connection (if needed)
 #sudo nmcli connection up Ouster
@@ -69,18 +72,18 @@ cd $SCRIPT_DIR/Docker
 
 # Start container
 echo "Starting container..."
-docker compose up -d --scale recorder=0 --scale evk4=0 --scale foxglove=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 --scale hmr_localisation=0 --scale scovox=0 &
+docker compose up -d --scale recorder=0 --scale evk4=0 --scale mapir_ffmpeg=0 --scale rm3100=0 --scale foxglove=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 --scale hmr_localisation=0 --scale scovox=0 --scale domain_bridge=0 &
 
 # Wait for container to be ready
-sleep 4
+sleep 2
 
 # Get container PID
-pid=$(docker inspect -f '{{.State.Pid}}' rm3100)
+#pid=$(docker inspect -f '{{.State.Pid}}' rm3100)
 
 # Move can0 to container
 #echo "Moving can0 to container namespace (PID: $pid)"
-sudo ip link set can0 down
-sudo ip link set can0 netns $pid 2>&1 | grep -v "Invalid argument" || true
+#sudo ip link set can0 down
+#sudo ip link set can0 netns $pid 2>&1 | grep -v "Invalid argument" || true
 
 # Verify it's in the container
 #echo "=== CAN0 Status in Container ==="

@@ -17,12 +17,14 @@ def make_scovox_node(robot_name: str, use_sim_time):
             "depth_topic": "rgbd_camera_depth_image",
             "depth_info_topic": "rgbd_camera_info",
             "seg_topic": "segmentation/colored",
-            "integration_frame": "odom_curt",
+            "mode": "rolling",
+            "input_pointcloud_topic": "/ouster/points",
+            "integration_frame": "map_curt",
             "base_frame": "base_link_curt",
             "robot_id": robot_name,
             "scovox_topic": "~/scovox",
             "pointcloud_topic": "~/pointcloud",
-            "publish_planning_map": True,
+            "publish_planning_map": False,
             "planning_map_topic": "~/planning_map",
             "planning_map_resolution": 0.20,
             "planning_map_size_m": 80.0,
@@ -36,7 +38,7 @@ def make_scovox_node(robot_name: str, use_sim_time):
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
-    robots = ["curt"]
+    robots = ["curt", "bunker"]
 
     scovox_nodes = [make_scovox_node(robot, use_sim_time) for robot in robots]
 
@@ -52,6 +54,8 @@ def generate_launch_description():
             "use_sim_time": use_sim_time,
             "input_topics": map_inputs,
             "pointcloud_topic": "/dscovox_mapping/pointcloud",
+            "map_frame": "map_curt",
+            "pointcloud_min_interval_s": 0.5,
         }],
     )
 

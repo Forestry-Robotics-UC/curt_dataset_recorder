@@ -54,7 +54,7 @@
     "points_time_offset": 0.0,
     "acc_scale": 0.0, // Auto-detect if zero
     // TF config
-    "imu_frame_id": "imu_curt", // Auto-detect if blank
+    "imu_frame_id": "imu_curt", // Auto-detect if blank imu_curt os_lidar
     "lidar_frame_id": "os_lidar", // Auto-detect if blank
     "base_frame_id": "base_link_curt", // If blank, IMU frame ID is used
     "odom_frame_id": "odom_curt",
@@ -69,7 +69,7 @@
       // "libimu_validator.so"
     ],
     // Topics
-    "imu_topic": "/curt/imu/data",
+    "imu_topic": "/curt/imu/data", ///ouster/imu
     "points_topic": "/ouster/points",
     "image_topic": "/curt/camera_curt/color/image_raw",
     // QoS options

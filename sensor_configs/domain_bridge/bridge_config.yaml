@@ -1,0 +1,41 @@
+# Name of the domain bridge, used for node naming and logging
+name: domain_bridge
+from_domain: 37
+to_domain: 30
+topics:
+  # Bridge "/tf" topic from doman ID 37 to domain ID 30
+  # /tf:
+  #   type: tf2_msgs/msg/TFMessage
+  #   bidirectional: True
+  #   qos:
+  #     reliability: reliable
+  # Bridge "/curt/scovox_node/scovox_bin" topic from doman ID 37 to domain ID 30
+  /curt/scovox_node/scovox_bin:
+    type: scovox_msgs/msg/ScovoxMapBinary
+    bidirectional: True
+    # Override QoS reliablity setting to be best effort
+    # This affects the domain bridge subscription and publisher
+    # This does NOT affect the other "chatter" bridge below, which is for a different domain
+    qos:
+      reliability: reliable
+  # # Also bridge "/chatter" topic from doman ID 2 to domain ID 4
+  # chatter:
+  #   type: example_interfaces/msg/String
+  #   to_domain: 4
+  # # Bridge reversed "/chatter" topic
+  # chatter:
+  #   type: example_interfaces/msg/String
+  #   # Reverse 'from' and 'to' domains (bridge from domain ID 3 to domain ID 2)
+  #   reversed: True
+  # # Bridge bidirectional "/chatter" topic
+  # chatter:
+  #   type: example_interfaces/msg/String
+  #   from_domain: 7
+  #   to_domain: 8
+  #   # Bridge from domain ID 7 to domain ID 8 AND from domain ID 8 to domain ID 7
+  #   bidirectional: True
+
+  # # Bridge "/chatter" topic from doman ID 2 to domain ID 3, but as "/chitter"
+  # chatter:
+  #   type: example_interfaces/msg/String
+  #   remap: chitter

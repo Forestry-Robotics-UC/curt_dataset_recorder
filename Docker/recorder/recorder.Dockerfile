@@ -30,7 +30,8 @@ RUN apt -y install ros-jazzy-rmw-cyclonedds-cpp \
     ros-jazzy-metavision-driver \
     ros-jazzy-tf2-eigen \
     ros-jazzy-compressed-image-transport \
-    ros-jazzy-ffmpeg-image-transport
+    ros-jazzy-ffmpeg-image-transport \
+    ros-${ROS_DISTRO}-cv-bridge
 
 #Configure catkin workspace
 ENV CATKIN_WS=/root/ros2_ws
@@ -42,6 +43,8 @@ WORKDIR $CATKIN_WS/src
 RUN git clone -b ros2 --recurse-submodules https://github.com/errorcodecritical/ouster-ros.git
 
 RUN git clone https://github.com/tu-darmstadt-ros-pkg/hector_recorder.git
+
+RUN git clone https://github.com/kalhansb/scovox.git
 
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc

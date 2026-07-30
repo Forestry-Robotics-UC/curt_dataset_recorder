@@ -60,6 +60,16 @@
       0.70710678,
       0.70710678
     ],
+    // "T_lidar_imu":
+    // [
+    //   0.0,
+    //   0.0,
+    //   0.0,
+    //   0.0,
+    //   0.0,
+    //   0.0,
+    //   1.0
+    // ],
     "intensity_field": "intensity",
     "ring_field": "ring",
     // LiDAR per-point time settings

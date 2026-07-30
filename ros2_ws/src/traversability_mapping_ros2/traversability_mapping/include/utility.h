@@ -81,7 +81,7 @@ typedef struct kdres kdres_t;
 extern const bool urbanMapping = false;
 
 // Using velodyne cloud "ring" channel for image projection (other lidar may have different name for this channel, change "PointXYZIR" below)
-extern const bool useCloudRing = true; // if true, ang_res_y and ang_bottom are not used
+extern const bool useCloudRing = false; // if true, ang_res_y and ang_bottom are not used
 
 extern const float sensorMinimumRange = 0.2; // 1.0 0.2
 
@@ -96,7 +96,7 @@ extern const float ang_bottom = 15.0+0.1; //15.0
 
 // Map Params
 extern const float mapResolution = 0.1; // map resolution
-extern const float mapCubeLength = 1.0; // the length of a sub-map (meters) 1.0
+extern const float mapCubeLength = 5.0; // the length of a sub-map (meters) 1.0
 extern const int mapCubeArrayLength = mapCubeLength / mapResolution; // the grid dimension of a sub-map (mapCubeLength / mapResolution)
 extern const int mapArrayLength = 2000 / mapCubeLength; // the sub-map dimension of global map (2000m x 2000m)
 extern const int rootCubeIndex = mapArrayLength / 2; // by default, robot is at the center of global map at the beginning

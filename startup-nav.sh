@@ -57,8 +57,16 @@ cleanup() {
 # Set trap
 trap cleanup EXIT
 
+# --- CONFIGURATION ---
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+
+#Streaming stats
+(bash $SCRIPT_DIR/monitor_stats.sh >/dev/null 2>&1)&
+
 #Restart Robot ROS2
-sudo systemctl restart ipa-ros-autostart.service
+#sudo systemctl restart ipa-ros-autostart.service
+
+sleep 1
 
 # Bring up the network connection (if needed)
 #sudo nmcli connection up Ouster
@@ -66,17 +74,28 @@ sudo systemctl restart ipa-ros-autostart.service
 # Kill the ROS2 openzen IMU node from host (if needed)
 sudo pkill -f "openzen_node" || true
 
-# --- CONFIGURATION ---
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 cd $SCRIPT_DIR/Docker
 
 # Start container
 echo "Starting container..."
-docker compose up --scale evk4=0 --scale foxglove=0 --scale recorder=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 &
+# docker compose up --scale evk4=0 --scale foxglove=0 --scale recorder=0 --scale glim=0 --scale traversability_ros2=0 --scale nav2=0 &
+docker compose up -d --scale evk4=0 --scale emlid=0 --scale rm3100=0 --scale foxglove=0 --scale recorder=0 --scale hmr_localisation=0 --scale curt=0 --scale traversability_ros2=0 --scale glim=0
+
+sleep 1
+
+docker compose up -d glim
+
+# sleep 20
+
+# docker compose up -d traversability_ros2
+
+sleep 1
 
 # Wait for container to be ready
 #sleep 4
-wait
+# Run the recorder
+echo "Starting recorder..."
+docker compose run -i --rm recorder
 
 # Get container PID
 # pid=$(docker inspect -f '{{.State.Pid}}' rm3100)

@@ -49,9 +49,9 @@ def generate_launch_description():
         'behavior_server',
         #'velocity_smoother',
         #'collision_monitor',
-        'bt_navigator',
+        'bt_navigator'
         #'waypoint_follower',
-        'map_server'
+        #'map_server'
     ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
@@ -60,7 +60,7 @@ def generate_launch_description():
     # https://github.com/ros/robot_state_publisher/pull/30
     # TODO(orduno) Substitute with `PushNodeRemapping`
     #              https://github.com/ros2/launch_ros/issues/56
-    remappings = [('curt/tf', 'tf'), ('curt/tf_static', 'tf_static')]
+    remappings = [('/tf', 'tf'), ('/tf_static', 'tf_static')]
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {'autostart': autostart}
@@ -80,7 +80,7 @@ def generate_launch_description():
     )
 
     declare_namespace_cmd = DeclareLaunchArgument(
-        'namespace', default_value='curt', description='Top-level namespace'
+        'namespace', default_value='', description='Top-level namespace'
     )
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(

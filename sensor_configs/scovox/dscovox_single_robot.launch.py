@@ -64,14 +64,15 @@ def launch_setup(context, *args, **kwargs):
     # Resolve every arg to a plain string once, then build nodes with native
     # Python types — far simpler than threading substitutions into list params.
     g = {k: LaunchConfiguration(k).perform(context) for k in _ARGS}
-    robot = g["robot"]
+    #robot = g["curt"]
+    robots = ["curt", "bunker"]
     use_sim_time = _bool(g["use_sim_time"])
-    bin_topic = f"/{robot}/scovox_node/scovox_bin"
+    bin_topic = [f"/{robot}/scovox_node/scovox_bin" for robot in robots]
 
     mapper = Node(
         package="scovox_mapping",
         executable="scovox_mapping_node",
-        namespace=robot,
+        namespace="curt",
         name="scovox_node",              # topic path depends on BOTH ns and name
         output="screen",
         parameters=[{
@@ -105,7 +106,6 @@ def launch_setup(context, *args, **kwargs):
     merger = Node(
         package="scovox_mapping",
         executable="dscovox_mapping_node",
-        namespace=robot,
         name="dscovox_node",
         output="screen",
         condition=IfCondition(g["with_merger"]),

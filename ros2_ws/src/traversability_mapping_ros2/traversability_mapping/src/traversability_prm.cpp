@@ -338,9 +338,9 @@ public:
         nav_msgs::msg::Path originPath;
         nav_msgs::msg::Path splinePath;
 
-        originPath.header.frame_id = "map";
+        originPath.header.frame_id = "map_curt";
         geometry_msgs::msg::PoseStamped pose;
-        pose.header.frame_id = "map";
+        pose.header.frame_id = "map_curt";
 
         originPath.poses.clear();
 
@@ -616,7 +616,7 @@ public:
 
             // path visualization
             visualization_msgs::msg::Marker markerPath;
-            markerPath.header.frame_id = "map";
+            markerPath.header.frame_id = "map_curt";
             markerPath.header.stamp = this->now();
             markerPath.action = visualization_msgs::msg::Marker::ADD;
             markerPath.type = visualization_msgs::msg::Marker::LINE_STRIP;
@@ -635,7 +635,7 @@ public:
 
             // goal point visualization
             visualization_msgs::msg::Marker markerGoal;
-            markerGoal.header.frame_id = "map";
+            markerGoal.header.frame_id = "map_curt";
             markerGoal.header.stamp = this->now();
             markerGoal.action = visualization_msgs::msg::Marker::ADD;
             markerGoal.type= visualization_msgs::msg::Marker::SPHERE_LIST;
@@ -666,7 +666,7 @@ public:
 
             // PRM nodes visualization
             visualization_msgs::msg::Marker markerNode;
-            markerNode.header.frame_id = "map";
+            markerNode.header.frame_id = "map_curt";
             markerNode.header.stamp = this->now();
             markerNode.action = visualization_msgs::msg::Marker::ADD;
             markerNode.type = visualization_msgs::msg::Marker::SPHERE_LIST;
@@ -687,7 +687,7 @@ public:
 
             // PRM edge visualization
             visualization_msgs::msg::Marker markerEdge;
-            markerEdge.header.frame_id = "map";
+            markerEdge.header.frame_id = "map_curt";
             markerEdge.header.stamp = this->now();
             markerEdge.action = visualization_msgs::msg::Marker::ADD;
             markerEdge.type = visualization_msgs::msg::Marker::LINE_LIST;
@@ -733,7 +733,7 @@ public:
 
             // single source path visualization
             visualization_msgs::msg::Marker markersPath;
-            markersPath.header.frame_id = "map";
+            markersPath.header.frame_id = "map_curt";
             markersPath.header.stamp = this->now();
             markersPath.action = visualization_msgs::msg::Marker::ADD;
             markersPath.type = visualization_msgs::msg::Marker::LINE_LIST;
@@ -762,7 +762,7 @@ public:
     }
 
     void publishPath(){
-        globalPath.header.frame_id = "map";
+        globalPath.header.frame_id = "map_curt";
         globalPath.header.stamp = this->now();
         // publish path
         pubGlobalPath->publish(globalPath);
@@ -800,11 +800,11 @@ public:
         // Publish
         sensor_msgs::msg::PointCloud2 laserCloudTemp;
         pcl::toROSMsg(nodeCloud, laserCloudTemp);
-        laserCloudTemp.header.frame_id = "map";
+        laserCloudTemp.header.frame_id = "map_curt";
         laserCloudTemp.header.stamp = this->now();
         pubCloudPRMNodes->publish(laserCloudTemp);
         pcl::toROSMsg(adjacencyCloud, laserCloudTemp);
-        laserCloudTemp.header.frame_id = "map";
+        laserCloudTemp.header.frame_id = "map_curt";
         laserCloudTemp.header.stamp = this->now();
         pubCloudPRMGraph->publish(laserCloudTemp);
     }
@@ -812,7 +812,7 @@ public:
     void getRobotState(){
         try {
             // Use rclcpp::Time(0) to get the latest available transform
-            transform = tf_buffer->lookupTransform("map", "base_link_curt", rclcpp::Time(0), rclcpp::Duration::from_seconds(0.1));
+            transform = tf_buffer->lookupTransform("map_curt", "base_link_curt", rclcpp::Time(0), rclcpp::Duration::from_seconds(0.1));
             robotState->x[0] = transform.transform.translation.x;
             robotState->x[1] = transform.transform.translation.y;
             robotState->x[2] = transform.transform.translation.z;
