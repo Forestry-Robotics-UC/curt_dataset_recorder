@@ -85,9 +85,9 @@ sleep 1
 
 docker compose up -d glim
 
-# sleep 20
+sleep 20
 
-# docker compose up -d traversability_ros2
+docker compose up -d traversability_ros2
 
 sleep 1
 

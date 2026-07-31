@@ -347,8 +347,7 @@ behavior_server:
     local_footprint_topic: local_costmap/published_footprint
     global_footprint_topic: global_costmap/published_footprint
     cycle_frequency: 10.0
-    behavior_plugins:
-      ["wait", "backup", "drive_on_heading", "assisted_teleop"] #"spin"
+    behavior_plugins: ["spin", "wait", "backup", "drive_on_heading", "assisted_teleop"]
     spin:
       plugin: "nav2_behaviors::Spin"
     backup:
