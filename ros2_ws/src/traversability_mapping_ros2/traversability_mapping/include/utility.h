@@ -98,7 +98,7 @@ extern const float ang_bottom = 15.0+0.1; //15.0
 extern const float mapResolution = 0.1; // map resolution
 extern const float mapCubeLength = 5.0; // the length of a sub-map (meters) 1.0
 extern const int mapCubeArrayLength = mapCubeLength / mapResolution; // the grid dimension of a sub-map (mapCubeLength / mapResolution)
-extern const int mapArrayLength = 2000 / mapCubeLength; // the sub-map dimension of global map (2000m x 2000m)
+extern const int mapArrayLength = 100 / mapCubeLength; // the sub-map dimension of global map (2000m x 2000m)
 extern const int rootCubeIndex = mapArrayLength / 2; // by default, robot is at the center of global map at the beginning
 
 // Filter Ring Params
@@ -107,7 +107,7 @@ extern const int scanNumSlopeFilter = 10;
 extern const int scanNumMax = std::max(scanNumCurbFilter, scanNumSlopeFilter);
 
 // Filter Threshold Params
-extern const float sensorRangeLimit = 200; // only keep points with in ... 12 | 6
+extern const float sensorRangeLimit = 30; // only keep points with in ... 12 | 6
 extern const float filterHeightLimit = (urbanMapping == true) ? 0.1 : 0.15; // step diff threshold  0.1 : 0.15 || 0.50
 extern const float filterAngleLimit = 20; // slope angle threshold 20
 extern const int filterHeightMapArrayLength = sensorRangeLimit * 2 / mapResolution;
@@ -123,11 +123,11 @@ extern const float large_log_odds = 100;
 extern const float max_log_odds_for_belief = 20; // 20
 
 // 2D Map Publish Params
-extern const int localMapLength = 200.0; // length of the local occupancy grid map (meter)
+extern const int localMapLength = 10.0; // length of the local occupancy grid map (meter)
 extern const int localMapArrayLength = localMapLength / mapResolution;
 
 // Visualization Params
-extern const float visualizationRadius = 200;
+extern const float visualizationRadius = 30;
 extern const float visualizationFrequency = 2; //2 n, skip n scans then publish, n=0, visualize at each scan
 
 // Robot Params

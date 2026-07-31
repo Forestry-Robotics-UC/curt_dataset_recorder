@@ -95,18 +95,18 @@ controller_server:
       model_dt: 0.1
       batch_size: 2000
       enable_stamped_cmd_vel: true
-      ax_max: 3.0
-      ax_min: -3.0
-      ay_max: 3.0
-      ay_min: -3.0
-      az_max: 3.5
-      vx_std: 0.2
-      vy_std: 0.2
-      wz_std: 0.4
-      vx_max: 0.5
-      vx_min: -0.35
-      vy_max: 0.5
-      wz_max: 1.9
+      ax_max: 40.0
+      ax_min: -40.0
+      ay_max: 40.0
+      ay_min: -40.0
+      az_max: 10.0
+      vx_std: 0.8
+      vy_std: 0.8
+      wz_std: 1.0
+      vx_max: 15.0
+      vx_min: -15.0
+      vy_max: 15.0
+      wz_max: 50.0
       iteration_count: 1
       temperature: 0.3
       gamma: 0.015
@@ -242,8 +242,8 @@ local_costmap:
 global_costmap:
   global_costmap:
     ros__parameters:  
-      update_frequency: 1.0
-      publish_frequency: 1.0
+      update_frequency: 5.0
+      publish_frequency: 5.0
       rolling_window: False
       global_frame: map_curt
       robot_base_frame: base_link_curt
