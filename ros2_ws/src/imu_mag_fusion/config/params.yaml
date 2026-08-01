@@ -1,5 +1,0 @@
-/**:
-  ros__parameters:
-    imu_topic: '/curt/imu/data' # Input topic for IMU data
-    mag_topic: '/curt/mag' # Input topic for magnetometer data
-    fused_topic: '/curt/imu/fused' # Output topic for fused IMU data

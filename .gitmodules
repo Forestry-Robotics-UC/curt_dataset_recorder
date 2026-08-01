@@ -1,0 +1,12 @@
+[submodule "ros2_ws/src/curt_description"]
+	path = ros2_ws/src/curt_description
+	url = https://github.com/Forestry-Robotics-UC/curt_description.git
+[submodule "ros2_ws/src/imu_mag_fusion"]
+	path = ros2_ws/src/imu_mag_fusion
+	url = https://github.com/Forestry-Robotics-UC/imu_mag_fusion.git
+[submodule "ros2_ws/src/realsense_camera_info_override"]
+	path = ros2_ws/src/realsense_camera_info_override
+	url = https://github.com/Forestry-Robotics-UC/realsense_camera_info_override.git
+[submodule "ros2_ws/src/traversability_mapping_ros2"]
+	path = ros2_ws/src/traversability_mapping_ros2
+	url = https://github.com/Forestry-Robotics-UC/traversability_mapping_ros2.git
