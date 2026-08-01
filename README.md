@@ -1,5 +1,13 @@
 This repository provides a pipeline to record datasets with CURTmini robot. For a detailed instruction manual, please check the [Wiki](https://github.com/Forestry-Robotics-UC/curt_dataset_recorder/wiki)!
 
+## 0. Clone Repository
+
+This repository uses submodules. To clone it with all submodules:
+
+```bash
+git clone --recursive https://github.com/Forestry-Robotics-UC/curt_dataset_recorder.git
+```
+
 ## 1. System Architecture
 
 The entire data-acquisition system for the CURTmini is organized under:
@@ -248,5 +256,79 @@ Notes:
 
 Config files:
 `params.yaml`
+
+---
+
+## 5. Revert CURTmini Host Multi-Robot Changes
+
+This section describes the host-side configuration changes made to the CURTmini robot for multi-robot operation and network communication.
+
+### 5.1 Workspace and URDF Modifications
+
+**Reverting to original workspace:**
+The original workspace path is `~/workspace (original)` (not modified). The following changes were made to the CURTmini `~/workspace` workspace:
+
+| File | Change | Purpose |
+|------|--------|---------|
+| `~/workspace/src/curt_mini/curt_mini/bringup/robot_base.launch.py` | Commented out `imu_lpresearch` (internal OpenZen IMU) | OpenZen IMU driver is launched separately from `curt_dataset_recorder` |
+| `~/workspace/src/curt_mini/curt_mini/models/*.xacro` | Updated to custom xacro files | Contains external sensors mounted on CURTmini with modified frame names (e.g., `base_link` → `base_link_curt`) |
+| `~/workspace/src/curt_mini/curt_mini/config/ros2_control.yaml` | Changed `odom_frame_id` to `odom_curt`, `base_frame_id` to `base_link_curt` | Enable multiple robots on the same network sharing `/tf` topic without interference |
+| `~/workspace/src/curt_mini/curt_mini/config/twist_mux.yaml` | Added `/nav2/cmd_vel_stamped` topic | Required for nav2 to send goals to the robot |
+
+**After modifying the workspace:**
+```bash
+cd ~/workspace
+colcon build
+source ~/workspace/install/setup.bash
+```
+
+### 5.2 CycloneDDS Configuration
+
+**Network Interface Setup:**
+The host ROS 2 uses CycloneDDS for communication. By default, controllers use the `lo` (loopback) network interface. To enable ROS 2 communication over WiFi, the CycloneDDS configuration file must be updated.
+
+- **Backup file:** `/opt/ros/cyclonedds-config.xml.bak` (original configuration)
+- **Action:** Replace the active configuration with the backup.
+- **WiFi Interface:** Currently configured for `wlxf8d1110ce656`
+
+### 5.3 System Services
+
+Two systemd services are configured to start at boot:
+
+#### Hotspot Service
+- **Service name:** `start_ap.service`
+- **Purpose:** Enables hotspot mode on CURTmini startup for field SSH access
+- **SSID:** nuc-curt-mini-sn3
+- **IP Address:** 10.42.0.1
+
+#### WiFi Network Service
+- **Service name:** `start_wifi_specific_network.service`
+- **Purpose:** Automatically connects to the designated router for multi-robot network operation
+
+**Service Management Commands:**
+
+| Command | Description |
+|---------|-------------|
+| `sudo systemctl enable start_ap.service` | Enable service to start on boot |
+| `sudo systemctl disable start_ap.service` | Disable service from starting on boot |
+| `sudo systemctl start start_ap.service` | Start the service immediately |
+| `sudo systemctl stop start_ap.service` | Stop the service immediately |
+
+### 5.4 Environment Configuration (.bashrc)
+
+The following entries are added to `~/.bashrc` for convenience:
+
+```bash
+# Launch aliases
+alias start="bash /$HOME/Documents/Duarte/curt_dataset_recorder/startup.sh"
+alias mario="bash /$HOME/Documents/Duarte/startup-mario.sh"
+alias start-nav="bash /$HOME/Documents/Duarte/curt_dataset_recorder/startup-nav.sh"
+
+# Enable Docker containers to use the host display
+xhost +
+
+# ROS 2 Domain ID
+export ROS_DOMAIN_ID=37
+```
 
 ---
