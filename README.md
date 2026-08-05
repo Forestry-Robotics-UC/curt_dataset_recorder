@@ -129,21 +129,16 @@ It hosts a Wi-Fi hotspot:
 
 ### 2.2 Launching the Recording System
 
-Run the script **startup.sh** to start all the system components. The script will tranfer the RM3100 CAN device to the container and run:
-
-1. **docker compose up -d**
-   → Starts all sensor containers in the background
-2. **docker compose run -i --rm recorder**
-   → Opens an interactive shell and launches the hector_recorder TUI
-   The recorder will then:
+Just write start on the terminal and press enter (--help is available). The recorder will then:
 
 - Ask for a bag name (leave empty to auto-generate)
 - Start recording once confirmed
-  All ROS2 bags are saved outside the containers. In the directory that you mount to the recorder container, inside the docker-compose file. By default, ouside the repo main directory.
+  All ROS2 bags are saved in ```~/Documents/Default/rosbags/```.
 
 #### To close the system:
 
 1. Press **Ctrl+C** to close the hector_recording and stop the system.
+
 ---
 
 ## 3. Recording Configuration

@@ -70,7 +70,7 @@ BAG_NAME="$(date +%Y_%m_%d_%H_%M_%S)__${label}_"
 #TOPICS="/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /curt/camera_curt/color/image_raw /curt/camera_curt/color/metadata /curt/camera_curt/color/camera_info /curt/camera_curt/imu /imu/data /imu/mag /imu/fused /event_camera/events /mapir/camera_info /mapir/image_raw/ffmpeg /fix /tf /tf_static /mag"
 #TOPICS="/ouster/points /ouster/metadata /curt/camera_curt/color/image_raw/compressed /curt/camera_curt/aligned_depth_to_color/image_raw /curt/camera_curt/color/metadata /curt/camera_curt/depth/metadata /curt/camera_curt/extrinsics/depth_to_color /curt/camera_curt/extrinsics/depth_to_depth /curt/camera_curt/color/camera_info /curt/camera_curt/aligned_depth_to_color/camera_info /curt/imu/data /curt/imu/mag /curt/imu/fused /mapir/camera_info /mapir/image_raw/ffmpeg /mapir/indices/ndvi /mapir/indices_color/ndvi /curt/fix /curt/mag /tf /tf_static"
 #TOPICS="/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw/compressed /camera/color/metadata /camera/color/camera_info /curt/imu/data /curt/imu/mag /curt/fix /tf /tf_static"
-TOPICS="/ouster/points /ouster/imu /ouster/metadata /camera/color/image_raw/compressed /camera/color/metadata /camera/color/camera_info /camera/aligned_depth_to_color/image_raw/compressed /camera/aligned_depth_to_color/camera_info /curt/imu/data /curt/imu/mag /curt/scovox_node/scovox_bin /dscovox_node/scovox /goal_pose /nav2/cmd_vel_stamped /path /plan /goal_checker_selector /mapir/image_raw/ffmpeg /diagnostics /rosout /tf /tf_static"
+TOPICS="/ouster/points /ouster/imu /ouster/metadata /camera/color/image_raw/compressed /camera/color/metadata /camera/color/camera_info /camera/aligned_depth_to_color/image_raw/compressed /camera/aligned_depth_to_color/camera_info /curt/imu/data /curt/imu/mag  /mapir/image_raw/ffmpeg /diagnostics /tf /tf_static"
 #TOPICS="/ouster/points /ouster/imu /ouster/metadata /imu/data"
 
 
@@ -79,7 +79,10 @@ mkdir -p "$BAG_DIR"
 # Start ROS2 bag recording
 echo "Starting ROS 2 bag recording..."
 #Run hector_recorder
-ros2 run hector_recorder record -o "$BAG_DIR/$BAG_NAME" --max-bag-size-gb 5 --topics $TOPICS &
+#ros2 run hector_recorder record -o "$BAG_DIR/$BAG_NAME" --max-bag-size-gb 5 --topics $TOPICS &
+ros2 run hector_recorder record -o "$BAG_DIR/$BAG_NAME" --max-bag-size-gb 5 &
+
+
 BAG_PID=$!
 
 trap "echo 'Stopping recording...'; kill -2 $BAG_PID 2>/dev/null || true" SIGINT SIGTERM

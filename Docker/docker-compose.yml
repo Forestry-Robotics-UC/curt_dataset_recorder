@@ -161,7 +161,12 @@ services:
     build:
       context: .
       dockerfile: recorder/recorder.Dockerfile
+      args:
+        USERNAME: rosuser
+        USER_UID: ${UID:-1000}
+        USER_GID: ${GID:-1000}
     container_name: recorder
+    user: ${USER_UID}:${USER_GID}  # Run as the specified user
     privileged: true
     network_mode: host
     volumes:
