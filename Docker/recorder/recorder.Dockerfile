@@ -44,8 +44,6 @@ RUN git clone -b ros2 --recurse-submodules https://github.com/errorcodecritical/
 
 RUN git clone https://github.com/tu-darmstadt-ros-pkg/hector_recorder.git
 
-RUN git clone https://github.com/kalhansb/scovox.git
-
 RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
 RUN echo "source /root/ros2_ws/install/setup.bash" >> ~/.bashrc
 

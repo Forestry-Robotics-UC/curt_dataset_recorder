@@ -25,6 +25,6 @@ source /root/ros2_ws/install/setup.bash
 #ros2 bag play /root/rosbags/2026_07_06_18_09_02__curt_kalhan_coop_ --clock &
 
 # Run Foxglove server
-#ros2 launch foxglove_bridge foxglove_bridge_launch.xml port:=9092
+ros2 launch foxglove_bridge foxglove_bridge_launch.xml port:=9092
 
-rviz2 -d /root/shared_folder/isr.rviz
+#rviz2 -d /root/shared_folder/isr.rviz

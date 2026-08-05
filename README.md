@@ -321,11 +321,6 @@ The following entries are added to `~/.bashrc` for convenience:
 ```bash
 # Launch aliases
 alias start="bash /$HOME/Documents/Duarte/curt_dataset_recorder/startup.sh"
-alias mario="bash /$HOME/Documents/Duarte/startup-mario.sh"
-alias start-nav="bash /$HOME/Documents/Duarte/curt_dataset_recorder/startup-nav.sh"
-
-# Enable Docker containers to use the host display
-xhost +
 
 # ROS 2 Domain ID
 export ROS_DOMAIN_ID=37
