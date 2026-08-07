@@ -171,13 +171,16 @@ services:
     network_mode: host
     volumes:
       - /dev/:/dev/
-      - ../../rosbags:/root/rosbags/
-      - ../ros2_ws/build/recorder-build:/root/ros2_ws/build
-      - ../shared_folder/:/root/shared_folder/
+      - ../../rosbags:/home/rosuser/rosbags/
+      - ../ros2_ws/build/recorder-build:/home/rosuser/ros2_ws/build
+      - ../shared_folder/:/home/rosuser/shared_folder/
     environment:
       - ROS_DOMAIN_ID=37
-    command: /root/shared_folder/recorder-launch.sh
-    cpuset: "14-15"
+      - BAGFILE_NAME=""
+      - TOPICS=""
+      - HEADLESS=0
+    command: /home/rosuser/shared_folder/recorder-launch.sh
+    cpuset: "12-15"
 
   ## Extra Sensors
 

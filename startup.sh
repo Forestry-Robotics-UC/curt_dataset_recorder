@@ -8,6 +8,7 @@ RTK=1
 RGB=1
 RECORD=1
 VIZUALIZATION=1
+QUIET=0
 MAG=0
 NAVIGATION=0
 RGBD=0
@@ -17,8 +18,11 @@ COMPRESSION=0
 
 # Help message function
 show_help() {
-  echo "Usage: $0 [OPTIONS]"
-  echo "The default behaviour is to RECORD the LiDAR, IMU, RTK and Compressed RGBD from RealSense. The vizualization by default is enable with a Foxglove websocket open on port 9092 to enable remote vizualization."
+  echo "Usage: $0 [OPTIONS] [BAG_NAME]"
+  echo ""
+  echo "The default behaviour is to RECORD the LiDAR, IMU, RTK and Compressed RGBD from RealSense."
+  echo "The vizualization by default is enable with a Foxglove websocket open on port 9092 to allow remote vizualization."
+  echo ""
   echo "Options:"
   echo "  -a, --all          Enable all sensors"
   echo "  -v, --verbose      Enable verbose mode"
@@ -28,7 +32,18 @@ show_help() {
   echo "  -r, --record       Enable recording"
   echo "  -n, --nav          Enable Navigation"
   echo "  -nv, --no-viz      Disable Vizualization"
+  echo "  --quiet            Suppress output"
   echo "  --help             Show this help message"
+  echo ""
+  echo "Arguments:"
+  echo "  BAG_NAME           Optional bag file name. If not provided, a random name from .names file will be used."
+  echo "                     Spaces will be replaced with underscores."
+  echo ""
+  echo "Examples:"
+  echo "  $0                                 # Use random bag name"
+  echo "  $0 my_bag_name                     # Use 'my_bag_name' as bag name"
+  echo "  $0 -a my_bag_name                 # Enable all sensors with custom bag name"
+  echo "  $0 -d l,i -c experiment_01        # Disable LiDAR and IMU, enable compression"
   exit 0
 }
 
@@ -80,6 +95,79 @@ enable_all_sensors() {
   MAG=1
 }
 
+# Decide which TOPICS to record
+build_topics() {
+  TOPICS=""
+  
+  # TF is always recorded (needed for transforms)
+  TOPICS="$TOPICS /tf /tf_static"
+  
+  # LiDAR topics
+  if [ "$LIDAR" -eq 1 ]; then
+    TOPICS="$TOPICS /ouster/points /ouster/metadata /ouster/imu"
+  fi
+  
+  # IMU topics
+  if [ "$IMU" -eq 1 ]; then
+    TOPICS="$TOPICS /curt/imu/data"
+  fi
+  
+  # Magnetometer topics
+  if [ "$MAG" -eq 1 ]; then
+    TOPICS="$TOPICS /curt/imu/mag /curt/mag"
+  fi
+  
+  # Fused IMU data (record when either IMU or MAG is enabled)
+  if [ "$IMU" -eq 1 ] || [ "$MAG" -eq 1 ]; then
+    TOPICS="$TOPICS /curt/imu/fused"
+  fi
+  
+  # RTK/GPS topics
+  if [ "$RTK" -eq 1 ]; then
+    TOPICS="$TOPICS /curt/fix"
+  fi
+  
+  # RGB camera topics
+  if [ "$RGB" -eq 1 ]; then
+    if [ "$COMPRESSION" -eq 1 ]; then
+      TOPICS="$TOPICS /curt/camera_curt/color/image_raw/compressed"
+    else
+      TOPICS="$TOPICS /curt/camera_curt/color/image_raw"
+    fi
+    TOPICS="$TOPICS /curt/camera_curt/color/metadata /curt/camera_curt/color/camera_info"
+  fi
+  
+  # RGBD (depth) topics
+  if [ "$RGBD" -eq 1 ]; then
+    TOPICS="$TOPICS /curt/camera_curt/aligned_depth_to_color/image_raw /curt/camera_curt/depth/metadata /curt/camera_curt/aligned_depth_to_color/camera_info /curt/camera_curt/extrinsics/depth_to_color /curt/camera_curt/extrinsics/depth_to_depth"
+  fi
+  
+  # Event camera topics
+  if [ "$EVENT" -eq 1 ]; then
+    TOPICS="$TOPICS /event_camera/events"
+  fi
+  
+  # MAPIR camera topics
+  if [ "$MAPIR" -eq 1 ]; then
+    TOPICS="$TOPICS /mapir/camera_info /mapir/image_raw/ffmpeg /mapir/indices/ndvi /mapir/indices_color/ndvi"
+  fi
+  
+  # Navigation topics
+  if [ "$NAVIGATION" -eq 1 ]; then
+    TOPICS="$TOPICS /goal_pose /nav2/cmd_vel_stamped /path /plan /goal_checker_selector"
+  fi
+  
+  # Trim leading space
+  TOPICS="${TOPICS# }"
+  
+  # If quiet mode is off, print the selected topics
+  if [ "$QUIET" -eq 0 ]; then
+    echo "Recording topics: $TOPICS"
+  fi
+}
+
+
+
 # Parse arguments
 while getopts ":aed:crnvq-:" opt; do
   case $opt in
@@ -120,6 +208,24 @@ if [ -n "$DISABLE_LIST" ]; then
   disable_sensors "$DISABLE_LIST"
 fi
 
+
+
+#TOPICS="/ouster/points /ouster/metadata /curt/camera_curt/color/image_raw/compressed /curt/camera_curt/aligned_depth_to_color/image_raw /curt/camera_curt/color/metadata /curt/camera_curt/depth/metadata /curt/camera_curt/extrinsics/depth_to_color /curt/camera_curt/extrinsics/depth_to_depth /curt/camera_curt/color/camera_info /curt/camera_curt/aligned_depth_to_color/camera_info /curt/imu/data /curt/imu/mag /curt/imu/fused /mapir/camera_info /mapir/image_raw/ffmpeg /mapir/indices/ndvi /mapir/indices_color/ndvi /curt/fix /curt/mag /tf /tf_static"
+
+
+build_topics
+
+
+# After parsing options, check for positional argument
+shift $((OPTIND-1))
+
+if [ $# -gt 0 ]; then
+    BAGFILE_NAME="$1"
+    # Sanitize
+    BAGFILE_NAME=$(echo "$BAGFILE_NAME" | tr ' ' '_' | tr -cd '[:alnum:]_.-')
+fi
+
+
 # Cleanup function
 cleanup() {
     local exit_code=$?
@@ -133,11 +239,14 @@ cleanup() {
     return $exit_code
 }
 
-# Set trap
-trap cleanup EXIT
+# Set trap only when not on quiet mode
+if [ "$QUIET" -eq 0 ]; then
+  trap cleanup EXIT
+fi
+
 
 #Restart Robot ROS2
-#sudo systemctl restart ipa-ros-autostart.service # MAYBE NOT NEEDED 
+#sudo systemctl restart ipa-ros-autostart.service # MAYBE NOT NEEDED
 
 # Bring up the network connection (if needed)
 #sudo nmcli connection up Ouster
@@ -171,6 +280,10 @@ sleep 2
 
 # Run the recorder
 if [ "$RECORD" -eq 1 ]; then
-    echo "Starting recorder..."
-    docker compose run -i --rm recorder
+  if [ "$QUIET" -eq 1 ]; then
+    docker compose run  -d --rm -e HEADLESS=1 -e TOPICS="$TOPICS" -e BAGFILE_NAME="$BAGFILE_NAME" recorder
+  else
+    docker compose run --rm -e TOPICS="$TOPICS" -e BAGFILE_NAME="$BAGFILE_NAME" recorder
+  fi
+
 fi

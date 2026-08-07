@@ -1,6 +1,6 @@
 This repository provides a pipeline to record datasets with CURTmini robot. For a detailed instruction manual, please check the [Wiki](https://github.com/Forestry-Robotics-UC/curt_dataset_recorder/wiki)!
 
-## 0. Clone Repository
+# 0. Clone Repository
 
 This repository uses submodules. To clone it with all submodules:
 
@@ -8,7 +8,7 @@ This repository uses submodules. To clone it with all submodules:
 git clone --recursive https://github.com/Forestry-Robotics-UC/curt_dataset_recorder.git
 ```
 
-## 1. System Architecture
+# 1. System Architecture
 
 The entire data-acquisition system for the CURTmini is organized under:
 
@@ -64,7 +64,7 @@ The entire data-acquisition system for the CURTmini is organized under:
 └── startup.sh
 ```
 
-### 1.1 Docker Containers
+## 1.1 Docker Containers
 
 Each sensor package has its own Dockerfile inside its corresponding directory:
 
@@ -82,13 +82,13 @@ Each sensor package has its own Dockerfile inside its corresponding directory:
 
 A **docker-compose.yml** file creates all containers for the sensors and the recording.
 
-### 1.2 Shared ROS 2 Workspace
+## 1.2 Shared ROS 2 Workspace
 
 The directory ```ros2_ws/``` is a workspace shared across all containers. Each container mounts:
 
 - **ros2_ws/<sensor>-build/** → Build folder of each container This prevents each container from rebuilding the full workspace and allows faster startup. This directory also contains two packages that are being shared to the containers:
 
-### 1.3 Shared Entry-Point Scripts
+## 1.3 Shared Entry-Point Scripts
 
 The folder **shared_folder/** contains launcher scripts used by each container:
 
@@ -98,23 +98,36 @@ The folder **shared_folder/** contains launcher scripts used by each container:
 
 The recorder entry point runs the **hector_recorder** ROS2 command.
 
-### 1.4 Sensor Configuration
+## 1.4 Sensor Configuration
 
 This folder has every configuration needed to each sensor. Every sensor has its own directory and the files are linked to the respective containers.
 
-### 1.5 CURTmini URDF Package
+## 1.5 CURTmini URDF Package
 
 This folder, inside ```ros2_ws/```, has the package needed to launch the CURTmini URDF with all the sensors.
 
-### 1.6 IMU - Magnetometer Fusion Package
+## 1.6 IMU - Magnetometer Fusion Package
 
 This directory, inside ```ros2_ws/```, contains the package responsible for fusing data from the internal **OpenZen IMU** with the **RM3100 magnetometer** to compute the **Attitude and Heading Reference System (AHRS)**. The fused output is published to the ```/imu/fused``` topic at a frequency of ```500 Hz```. Configuration options, topic names, can be adjusted in the parameters.yaml file located within the config/ subdirectory.
 
 ---
 
-## 2. System Startup Procedure
+# 2. System Startup Procedure
 
-### 2.1 Connecting to the CURT-NUC
+
+There are two main ways to start recording with Curt Mini. With only the controller and by remote SSH session. Using the controller is quicker and simpler but you loose feedback of usefull informations such as the frequency rate of sensors.
+
+## 2.1 Starting with the Controller
+
+In a list, the procedure is:
+1. Start the robot and wait for it to be responsive
+2. Press the Green Button to start recording. The controller will vibrate when the recording starts (can take more than 30s).
+3. Press the Red Button to stop recording. The controller will vibrate when all containers stop.
+
+
+## 2.2 Starting with remote SSH 
+
+### Connecting to the CURT-NUC
 
 The hotspot automatically powers on when the CURTmini robot is turned on.
 
@@ -129,59 +142,46 @@ It hosts a Wi-Fi hotspot:
 
 ### 2.2 Launching the Recording System
 
-Just write start on the terminal and press enter (--help is available). The recorder will then:
+Once connected, just write ```start``` on the terminal and press enter. Optionally you can provide the name of the bag as an argument. The recorder will then start. For more information you can use the ```--help```.
 
-- Ask for a bag name (leave empty to auto-generate)
-- Start recording once confirmed
-  All ROS2 bags are saved in ```~/Documents/Default/rosbags/```.
+All ROS2 bags are saved in ```~/Documents/Default/rosbags/```.
 
-#### To close the system:
-
-1. Press **Ctrl+C** to close the hector_recording and stop the system.
+To close the recorder just press **Ctrl+C**.
 
 ---
 
-## 3. Recording Configuration
+# 3. Recording Configuration
 
-Current recording topics:
+Current default recording topics:
 
 ```text
-/ouster/lidar_packets /ouster/imu_packets /ouster/metadata /camera/color/image_raw /camera/aligned_depth_to_color/image_raw /camera/color/metadata /camera/depth/metadata /camera/extrinsics/depth_to_color /camera/extrinsics/depth_to_depth /camera/color/camera_info /camera/aligned_depth_to_color/camera_info /camera/imu /imu/data /imu/mag /imu/fused /event_camera/events /mapir/camera_info /mapir/image_raw /fix /tf /tf_static /mag
+/ouster/points /ouster/metadata /ouster/imu /curt/imu/data /curt/fix /curt/camera_curt/color/image_raw /curt/camera_curt/color/metadata /curt/camera_curt/color/camera_info
 ```
 
-To modify what is recorded:
+You can controll what sensors are recorded by modifiying the ```--enable``` flag:
+```text
+-e, --enable       Enable list of sensors [l, i, r, rtk, mag, event, rgb, rgbd, mapir]
+```
 
-1. Edit the **recorder entry-point script** in **shared_folder/recorder-launch.sh**
-2. Update:
-   - **TOPICS variable** → to add/remove ROS2 topics
-   - **hector_recorder command** → configure:
-     - Bag size limit
-     - Storage format (MCAP, SQLite)
-     - Compression
-     - Performance parameters
-     - etc…
-
----
-
-## 4. Sensor Configuration
+# 4. Sensor Configuration
 
 All sensor configuration live inside sensor_configs/.
 Configuration files are located here:
 
-### 4.1 Emlid
+## 4.1 Emlid
 
 Config file:
 `emlid/nmea_serial_driver.yaml`
 Launch file:
 `emlid/nmea_serial_driver.py`
 
-### 4.2 Ouster O1 LiDAR
+## 4.2 Ouster O1 LiDAR
 
 Config file:
 
 `ouster/driver_params.yaml`
 
-### 4.3 Realsense Camera
+## 4.3 Realsense Camera
 
 Launch file:
 `realsense/rs_launch.py`
@@ -214,16 +214,16 @@ Notes:
 - The ffmpeg path uses `ffmpeg_image_transport` with `libx264` and `crf:0` for minimum loss, but it should still be treated as near-lossless rather than byte-identical.
 - By default only `/camera/color/image_raw` is republished. Override `REALSENSE_COMPRESS_TOPICS` in `Docker/docker-compose.yml` if you also want additional raw image topics republished through the same transport.
 
-### 4.4 Xsens IMU
+## 4.4 Xsens IMU
 
 Launch file:
 `xsens/xsens_driver.launch.xml`
 
-### 4.5 OpenZen IMU
+## 4.5 OpenZen IMU
 
 To configure the OpenZen IMU, download the [official software](https://lp-research.atlassian.net/wiki/spaces/LKB/pages/1138294814/LPMS+Data+Acquisition+Software). However, is only compatible with Windows.
 
-### 4.6 Mapir
+## 4.6 Mapir
 
 Config files:
 `mapir/mapir3_ocn_camera_info.yaml`
@@ -247,18 +247,18 @@ Notes:
 - The ffmpeg path uses `ffmpeg_image_transport` with `libx264` and `crf:0` for minimum loss, but it should still be treated as near-lossless rather than byte-identical.
 - Override `MAPIR_COMPRESS_TOPICS` in `Docker/docker-compose.yml` if the MAPIR launch exposes additional raw image topics that you want republished.
 
-### 4.7 RM3100
+## 4.7 RM3100
 
 Config files:
 `params.yaml`
 
 ---
 
-## 5. Revert CURTmini Host Multi-Robot Changes
+# 5. Revert CURTmini Host Multi-Robot Changes
 
 This section describes the host-side configuration changes made to the CURTmini robot for multi-robot operation and network communication.
 
-### 5.1 Workspace and URDF Modifications
+## 5.1 Workspace and URDF Modifications
 
 **Reverting to original workspace:**
 The original workspace path is `~/workspace (original)` (not modified). The following changes were made to the CURTmini `~/workspace` workspace:
@@ -277,7 +277,7 @@ colcon build
 source ~/workspace/install/setup.bash
 ```
 
-### 5.2 CycloneDDS Configuration
+## 5.2 CycloneDDS Configuration
 
 **Network Interface Setup:**
 The host ROS 2 uses CycloneDDS for communication. By default, controllers use the `lo` (loopback) network interface. To enable ROS 2 communication over WiFi, the CycloneDDS configuration file must be updated.
@@ -286,17 +286,21 @@ The host ROS 2 uses CycloneDDS for communication. By default, controllers use th
 - **Action:** Replace the active configuration with the backup.
 - **WiFi Interface:** Currently configured for `wlxf8d1110ce656`
 
-### 5.3 System Services
+## 5.3 System Services
 
-Two systemd services are configured to start at boot:
+Three systemd services are configured to start at boot:
 
-#### Hotspot Service
+### Joystick Service
+- **Service name:** `joystick-recorder.service`
+- **Purpose:** Listens to button presses from the Logitech controller to start and stop recordings.
+
+### Hotspot Service
 - **Service name:** `start_ap.service`
 - **Purpose:** Enables hotspot mode on CURTmini startup for field SSH access
 - **SSID:** nuc-curt-mini-sn3
 - **IP Address:** 10.42.0.1
 
-#### WiFi Network Service
+### WiFi Network Service
 - **Service name:** `start_wifi_specific_network.service`
 - **Purpose:** Automatically connects to the designated router for multi-robot network operation
 
@@ -309,7 +313,7 @@ Two systemd services are configured to start at boot:
 | `sudo systemctl start start_ap.service` | Start the service immediately |
 | `sudo systemctl stop start_ap.service` | Stop the service immediately |
 
-### 5.4 Environment Configuration (.bashrc)
+## 5.4 Environment Configuration (.bashrc)
 
 The following entries are added to `~/.bashrc` for convenience:
 
